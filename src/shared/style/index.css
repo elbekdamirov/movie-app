@@ -13,3 +13,42 @@
   padding-left: 12px;
   padding-right: 12px;
 }
+
+.ant-pagination-item {
+  border-color: red !important;
+  background-color: black !important;
+}
+
+.ant-pagination-item a {
+  color: red !important;
+}
+
+.ant-pagination-item-active {
+  background-color: red !important;
+}
+
+.ant-pagination-item-active a {
+  color: black !important;
+}
+
+.ant-pagination-item-ellipsis {
+  color: red !important;
+}
+
+.ant-pagination-item-ellipsis:hover {
+  color: red !important;
+}
+
+.ant-pagination-prev button,
+.ant-pagination-next button {
+  color: red !important;
+  border-color: red !important;
+}
+
+.ant-pagination-prev button:hover,
+.ant-pagination-next button:hover {
+  color: red !important;
+  border-color: red !important;
+}
+
+

@@ -54,7 +54,7 @@ export const Hero: FC<Props> = memo(({ movies }) => {
                   <div className="flex items-center justify-center gap-4 mb-6">
                     <span className="text-white/90 text-xl font-medium">
                       {new Date(movie.release_date).getFullYear()}
-                    </span> 
+                    </span>
                     <span className="text-white/70 text-2xl">•</span>
                     <span className="text-white/90 text-xl uppercase tracking-wide">
                       {movie.original_language}

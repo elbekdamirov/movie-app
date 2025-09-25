@@ -27,8 +27,10 @@ export const MovieCard: FC<Props> = memo((props) => {
         <h3 className="line-clamp-1" title={movie.title}>
           {movie.title}
         </h3>
+        <p>{new Date(movie.release_date).getFullYear()}</p>
         <p>
-          Rating: <strong className="text-py">{movie.vote_average.toFixed(2)}</strong>
+          Rating:{" "}
+          <strong className="text-py">{movie.vote_average.toFixed(2)}</strong>
         </p>
       </div>
     </div>

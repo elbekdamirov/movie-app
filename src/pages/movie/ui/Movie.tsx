@@ -1,5 +1,6 @@
 import { useMovie } from "@/entities/movie";
 import { MovieFilter } from "@/features/movie-filter";
+import { MovieFilterYear } from "@/features/movie-filter-year";
 import { MoviePagination } from "@/features/movie-pagination";
 import { MovieSort } from "@/features/movie-sort";
 import { MovieList } from "@/widgets/movie-list";
@@ -13,8 +14,25 @@ export const Movie = memo(() => {
   const page = searchParams.get("page") ?? "1";
   const sort_by = searchParams.get("sort_by") ?? "popularity.desc";
   const with_genres = searchParams.get("with_genres") ?? "";
+  const year_range = searchParams.get("year_range") ?? "";
 
-  const { data } = getMovies({ page: page as string, sort_by, with_genres });
+  let dateFilters: Record<string, string> = {};
+  if (year_range) {
+    const [start, end] = year_range.split("-");
+    if (start && end) {
+      dateFilters = {
+        "primary_release_date.gte": `${start}-01-01`,
+        "primary_release_date.lte": `${end}-12-31`,
+      };
+    }
+  }
+
+  const { data } = getMovies({
+    page: page as string,
+    sort_by,
+    with_genres,
+    ...dateFilters,
+  });
 
   return (
     <div className="py-6">
@@ -24,6 +42,7 @@ export const Movie = memo(() => {
             Total: {data?.total_results?.toLocaleString()}
           </h2>
           <div className="flex gap-4">
+            <MovieFilterYear />
             <MovieSort />
             <MovieFilter />
           </div>

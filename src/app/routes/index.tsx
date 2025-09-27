@@ -3,8 +3,7 @@ import { useRoutes } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 const Home = lazy(() => import("@/pages/home"));
 const Movie = lazy(() => import("@/pages/movie"));
-const Sessions = lazy(() => import("@/pages/sessions"));
-const Tickets = lazy(() => import("@/pages/tickets"));
+const Bookmark = lazy(() => import("@/pages/bookmark"));
 const Search = lazy(() => import("@/pages/search"));
 const Cast = lazy(() => import("@/pages/movie-detail/cast"));
 const Review = lazy(() => import("@/pages/movie-detail/review"));
@@ -20,8 +19,7 @@ const AppRouter = () => {
       element: <MainLayout />,
       children: [
         { path: "", element: <Home /> },
-        { path: "/sessions", element: <Sessions /> },
-        { path: "/tickets", element: <Tickets /> },
+        { path: "/bookmark", element: <Bookmark /> },
         { path: "/search", element: <Search /> },
         { path: "/movie", element: <Movie /> },
         {

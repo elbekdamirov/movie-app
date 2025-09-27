@@ -2,12 +2,13 @@ import { memo, useState, useEffect } from "react";
 import logo from "@/shared/assets/logo.svg";
 import { BsDisplayFill } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
-import { CgDisplaySpacing } from "react-icons/cg";
-import { TbTicket } from "react-icons/tb";
 import { IoSearch } from "react-icons/io5";
 import { BiSolidMoviePlay } from "react-icons/bi";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
+import { FaRegBookmark } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/app/store";
 
 export const Header = memo(() => {
   const [isDark, setIsDark] = useState(() => {
@@ -16,6 +17,10 @@ export const Header = memo(() => {
   });
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const bookmarkCount = useSelector(
+    (state: RootState) => state.bookmarks.saved.length
+  );
 
   useEffect(() => {
     if (isDark) {
@@ -27,17 +32,9 @@ export const Header = memo(() => {
     }
   }, [isDark]);
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
+  const toggleTheme = () => setIsDark(!isDark);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
     <header
@@ -78,23 +75,18 @@ export const Header = memo(() => {
           </NavLink>
 
           <NavLink
-            to={"/sessions"}
+            to={"/bookmark"}
             className={({ isActive }) =>
-              `flex flex-col items-center ${isActive && "text-py"}`
+              `relative flex flex-col items-center ${isActive && "text-py"}`
             }
           >
-            <CgDisplaySpacing size={25} />
-            <span className="text-sm">Сеансы</span>
-          </NavLink>
-
-          <NavLink
-            to={"/tickets"}
-            className={({ isActive }) =>
-              `flex flex-col items-center ${isActive && "text-py"}`
-            }
-          >
-            <TbTicket size={25} />
-            <span className="text-sm">Билеты</span>
+            <FaRegBookmark size={25} />
+            {bookmarkCount > 0 && (
+              <span className="absolute -top-1 -right-3 bg-py text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                {bookmarkCount}
+              </span>
+            )}
+            <span className="text-sm">Bookmark</span>
           </NavLink>
 
           <NavLink
@@ -180,25 +172,21 @@ export const Header = memo(() => {
               </NavLink>
 
               <NavLink
-                to={"/sessions"}
+                to={"/bookmark"}
                 onClick={closeMobileMenu}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 p-2 rounded ${isActive && "text-py"}`
+                  `relative flex items-center gap-3 p-2 rounded ${
+                    isActive && "text-py"
+                  }`
                 }
               >
-                <CgDisplaySpacing size={20} />
-                <span>Сеансы</span>
-              </NavLink>
-
-              <NavLink
-                to={"/tickets"}
-                onClick={closeMobileMenu}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-2 rounded ${isActive && "text-py"}`
-                }
-              >
-                <TbTicket size={20} />
-                <span>Билеты</span>
+                <FaRegBookmark size={20} />
+                {bookmarkCount > 0 && (
+                  <span className="absolute -top-1 left-5 bg-py text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                    {bookmarkCount}
+                  </span>
+                )}
+                <span>Bookmark</span>
               </NavLink>
 
               <NavLink

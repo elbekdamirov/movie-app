@@ -14,8 +14,8 @@ import appstore from "@/shared/assets/appstore.svg";
 
 export const Footer = memo(() => {
   return (
-    <footer className=" text-gray-300 py-10 bg-black">
-      <div className="container mx-auto  rounded-xl px-6 py-10 grid grid-cols-2 sm:justify-center sm:grid-cols-2 md:grid-cols-4 gap-8 bg-[#111111]">
+    <footer className=" dark:text-gray-300 py-10 dark:bg-black">
+      <div className="container mx-auto  rounded-xl px-6 py-10 grid grid-cols-2 sm:justify-center sm:grid-cols-2 md:grid-cols-4 gap-8 dark:bg-[#111111] bg-[#eeecec]">
         <div className="space-y-4">
           <img src={footerlogo} alt="footerlogo" className="w-24" />
           <div className="flex flex-col gap-3">

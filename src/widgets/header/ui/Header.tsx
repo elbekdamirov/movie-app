@@ -1,26 +1,42 @@
 import { memo, useState, useEffect } from "react";
 import logo from "@/shared/assets/logo.svg";
 import { BsDisplayFill } from "react-icons/bs";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { IoSearch } from "react-icons/io5";
 import { BiSolidMoviePlay } from "react-icons/bi";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { FaRegBookmark } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
+import { Dropdown, type MenuProps } from "antd";
+import { logout } from "@/features/auth";
 
 export const Header = memo(() => {
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem("theme");
     return saved ? saved === "dark" : true;
   });
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
-  const bookmarkCount = useSelector(
-    (state: RootState) => state.bookmarks.saved.length
-  );
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: <a href="https://www.antgroup.com">Profile</a>,
+    },
+    {
+      key: "2",
+      label: <span onClick={() => handleLogout()}>Logout</span>,
+    },
+  ];
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (isDark) {
@@ -81,11 +97,6 @@ export const Header = memo(() => {
             }
           >
             <FaRegBookmark size={25} />
-            {bookmarkCount > 0 && (
-              <span className="absolute -top-1 -right-3 bg-py text-white text-xs font-bold rounded-full px-1.5 py-0.5">
-                {bookmarkCount}
-              </span>
-            )}
             <span className="text-sm">Bookmark</span>
           </NavLink>
 
@@ -96,7 +107,7 @@ export const Header = memo(() => {
             }
           >
             <IoSearch size={25} />
-            <span className="text-sm">Поиск</span>
+            <span className="text-sm">Search</span>
           </NavLink>
         </div>
 
@@ -112,9 +123,27 @@ export const Header = memo(() => {
           >
             {isDark ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}
           </button>
-          <button className="py-2 px-4 md:py-4 md:px-16 bg-py text-white rounded-[12px] hover:bg-py/80 transition-colors cursor-pointer text-sm md:text-base">
-            Войти
-          </button>
+
+          {user ? (
+            <div>
+              <div>
+                <Dropdown menu={{ items }} placement="bottomLeft">
+                  <img
+                    className="size-10 rounded-full"
+                    src={user.picture}
+                    alt=""
+                  />
+                </Dropdown>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate("/login")}
+              className="py-2 px-4 md:py-4 md:px-16 bg-py text-white rounded-[12px] hover:bg-py/80 transition-colors cursor-pointer text-sm md:text-base"
+            >
+              Login
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -143,9 +172,9 @@ export const Header = memo(() => {
             isDark ? "bg-black border-gray-700" : "bg-white border-gray-200"
           } border-t shadow-lg`}
         >
-          <div className="container py-4 space-y-4">
+          <div className="container py-4 div-y-4">
             <div
-              className={`flex flex-col space-y-4 ${
+              className={`flex flex-col div-y-4 ${
                 isDark ? "text-[#A1A1A1]" : "text-gray-600"
               }`}
             >
@@ -181,11 +210,6 @@ export const Header = memo(() => {
                 }
               >
                 <FaRegBookmark size={20} />
-                {bookmarkCount > 0 && (
-                  <span className="absolute -top-1 left-5 bg-py text-white text-xs font-bold rounded-full px-1.5 py-0.5">
-                    {bookmarkCount}
-                  </span>
-                )}
                 <span>Bookmark</span>
               </NavLink>
 
@@ -197,7 +221,7 @@ export const Header = memo(() => {
                 }
               >
                 <IoSearch size={20} />
-                <span>Поиск</span>
+                <span>Search</span>
               </NavLink>
             </div>
 
@@ -206,7 +230,7 @@ export const Header = memo(() => {
                 onClick={closeMobileMenu}
                 className="w-full py-3 bg-py text-white rounded-[12px] hover:bg-py/80 transition-colors"
               >
-                Войти
+                Login
               </button>
             </div>
           </div>

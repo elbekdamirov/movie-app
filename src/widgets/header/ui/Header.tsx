@@ -126,6 +126,7 @@ export const Header = memo(() => {
           </button>
 
           <Select
+            className="language-select"
             value={i18n.language}
             style={{ width: 100 }}
             onChange={(lng) => i18n.changeLanguage(lng)}
@@ -167,7 +168,9 @@ export const Header = memo(() => {
       {isMobileMenuOpen && (
         <div
           className={`absolute top-20 left-0 right-0 z-50 lg:hidden ${
-            isDark ? "bg-black border-gray-700 text-white" : "bg-white border-gray-200"
+            isDark
+              ? "bg-black border-gray-700 text-white"
+              : "bg-white border-gray-200"
           } border-t shadow-lg`}
         >
           <div className="py-4 space-y-4">

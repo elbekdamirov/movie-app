@@ -23,7 +23,7 @@ export const SearchMovie = memo(() => {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={t("search.placeholder")}
-          className="dark:bg-gray-900 dark:text-white"
+          className="search-movie-input"
         />
         <br />
         <br />

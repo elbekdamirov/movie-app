@@ -7,7 +7,7 @@ import { Outlet, useParams } from "react-router-dom";
 export const MovieDetail = memo(() => {
   const { id } = useParams();
   const { getMovieInfo } = useMovie();
-  const { data } = getMovieInfo(id as string, "similar");
+  const { data, isLoading } = getMovieInfo(id as string, "similar");
 
   return (
     <div>
@@ -17,7 +17,7 @@ export const MovieDetail = memo(() => {
       <div className="container mt-10">
         <Title>Similar movies</Title>
       </div>
-      <MovieList movies={data?.results?.slice(0, 4)} />
+      <MovieList movies={data?.results?.slice(0, 4)} loading={isLoading} />
     </div>
   );
 });

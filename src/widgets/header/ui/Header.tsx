@@ -9,13 +9,17 @@ import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { FaRegBookmark } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { Dropdown, type MenuProps } from "antd";
+import { Dropdown, Select, type MenuProps } from "antd";
 import { logout } from "@/features/auth";
+import { useTranslation } from "react-i18next";
+import i18n from "@/app/i18n";
 
 export const Header = memo(() => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
+
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem("theme");
     return saved ? saved === "dark" : true;
@@ -26,13 +30,10 @@ export const Header = memo(() => {
   };
 
   const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: <a href="https://www.antgroup.com">Profile</a>,
-    },
+    { key: "1", label: <a href="/profile">Profile</a> },
     {
       key: "2",
-      label: <span onClick={() => handleLogout()}>Logout</span>,
+      label: <span onClick={handleLogout}>Logout</span>,
     },
   ];
 
@@ -61,7 +62,7 @@ export const Header = memo(() => {
       <div className="container flex justify-between items-center">
         <div className="flex-shrink-0">
           <NavLink to={"/"}>
-            <img src={logo} alt="" className="h-8 md:h-10" />
+            <img src={logo} alt="logo" className="h-8 md:h-10" />
           </NavLink>
         </div>
 
@@ -77,7 +78,7 @@ export const Header = memo(() => {
             }
           >
             <BsDisplayFill size={25} />
-            <span className="text-sm">Afisha</span>
+            <span className="text-sm">{t("header.nav.main")}</span>
           </NavLink>
 
           <NavLink
@@ -87,17 +88,17 @@ export const Header = memo(() => {
             }
           >
             <BiSolidMoviePlay size={25} />
-            <span className="text-sm">Movies</span>
+            <span className="text-sm">{t("header.nav.movies")}</span>
           </NavLink>
 
           <NavLink
             to={"/bookmark"}
             className={({ isActive }) =>
-              `relative flex flex-col items-center ${isActive && "text-py"}`
+              `flex flex-col items-center ${isActive && "text-py"}`
             }
           >
             <FaRegBookmark size={25} />
-            <span className="text-sm">Bookmark</span>
+            <span className="text-sm">{t("header.nav.saved")}</span>
           </NavLink>
 
           <NavLink
@@ -107,11 +108,11 @@ export const Header = memo(() => {
             }
           >
             <IoSearch size={25} />
-            <span className="text-sm">Search</span>
+            <span className="text-sm">{t("header.nav.search")}</span>
           </NavLink>
         </div>
 
-        <div className="hidden md:flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <button
             onClick={toggleTheme}
             className={`p-2 rounded-full transition-colors ${
@@ -124,42 +125,39 @@ export const Header = memo(() => {
             {isDark ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}
           </button>
 
+          <Select
+            value={i18n.language}
+            style={{ width: 100 }}
+            onChange={(lng) => i18n.changeLanguage(lng)}
+            options={[
+              { value: "uz", label: "UZ" },
+              { value: "ru", label: "RU" },
+              { value: "en", label: "EN" },
+            ]}
+          />
+
           {user ? (
-            <div>
-              <div>
-                <Dropdown menu={{ items }} placement="bottomLeft">
-                  <img
-                    className="size-10 rounded-full"
-                    src={user.picture}
-                    alt=""
-                  />
-                </Dropdown>
-              </div>
-            </div>
+            <Dropdown menu={{ items }} placement="bottomLeft">
+              <img
+                className="size-10 rounded-full cursor-pointer"
+                src={user.picture}
+                alt="user"
+              />
+            </Dropdown>
           ) : (
             <button
               onClick={() => navigate("/login")}
               className="py-2 px-4 md:py-4 md:px-16 bg-py text-white rounded-[12px] hover:bg-py/80 transition-colors cursor-pointer text-sm md:text-base"
             >
-              Login
+              {t("header.nav.login")}
             </button>
           )}
-        </div>
 
-        <div className="flex items-center gap-2 md:hidden">
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-full transition-colors ${
-              isDark
-                ? "text-yellow-400 hover:bg-gray-800"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            {isDark ? <MdLightMode size={20} /> : <MdDarkMode size={20} />}
-          </button>
           <button
             onClick={toggleMobileMenu}
-            className={`p-2 ${isDark ? "text-white" : "text-gray-800"}`}
+            className={`p-2 lg:hidden ${
+              isDark ? "text-white" : "text-gray-800"
+            }`}
           >
             {isMobileMenuOpen ? <HiX size={24} /> : <HiMenuAlt3 size={24} />}
           </button>
@@ -169,70 +167,45 @@ export const Header = memo(() => {
       {isMobileMenuOpen && (
         <div
           className={`absolute top-20 left-0 right-0 z-50 lg:hidden ${
-            isDark ? "bg-black border-gray-700" : "bg-white border-gray-200"
+            isDark ? "bg-black border-gray-700 text-white" : "bg-white border-gray-200"
           } border-t shadow-lg`}
         >
-          <div className="container py-4 div-y-4">
-            <div
-              className={`flex flex-col div-y-4 ${
-                isDark ? "text-[#A1A1A1]" : "text-gray-600"
-              }`}
+          <div className="py-4 space-y-4">
+            <NavLink
+              to={"/"}
+              onClick={closeMobileMenu}
+              className="flex items-center gap-3 p-2"
             >
-              <NavLink
-                to={"/"}
-                onClick={closeMobileMenu}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-2 rounded ${isActive && "text-py"}`
-                }
-              >
-                <BsDisplayFill size={20} />
-                <span>Afisha</span>
-              </NavLink>
+              <BsDisplayFill size={20} />
+              <span>{t("header.nav.main")}</span>
+            </NavLink>
 
-              <NavLink
-                to={"/movie"}
-                onClick={closeMobileMenu}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-2 rounded ${isActive && "text-py"}`
-                }
-              >
-                <BiSolidMoviePlay size={20} />
-                <span>Movies</span>
-              </NavLink>
+            <NavLink
+              to={"/movie"}
+              onClick={closeMobileMenu}
+              className="flex items-center gap-3 p-2"
+            >
+              <BiSolidMoviePlay size={20} />
+              <span>{t("header.nav.movies")}</span>
+            </NavLink>
 
-              <NavLink
-                to={"/bookmark"}
-                onClick={closeMobileMenu}
-                className={({ isActive }) =>
-                  `relative flex items-center gap-3 p-2 rounded ${
-                    isActive && "text-py"
-                  }`
-                }
-              >
-                <FaRegBookmark size={20} />
-                <span>Bookmark</span>
-              </NavLink>
+            <NavLink
+              to={"/bookmark"}
+              onClick={closeMobileMenu}
+              className="flex items-center gap-3 p-2"
+            >
+              <FaRegBookmark size={20} />
+              <span>{t("header.nav.saved")}</span>
+            </NavLink>
 
-              <NavLink
-                to={"/search"}
-                onClick={closeMobileMenu}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-2 rounded ${isActive && "text-py"}`
-                }
-              >
-                <IoSearch size={20} />
-                <span>Search</span>
-              </NavLink>
-            </div>
-
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={closeMobileMenu}
-                className="w-full py-3 bg-py text-white rounded-[12px] hover:bg-py/80 transition-colors"
-              >
-                Login
-              </button>
-            </div>
+            <NavLink
+              to={"/search"}
+              onClick={closeMobileMenu}
+              className="flex items-center gap-3 p-2"
+            >
+              <IoSearch size={20} />
+              <span>{t("header.nav.search")}</span>
+            </NavLink>
           </div>
         </div>
       )}

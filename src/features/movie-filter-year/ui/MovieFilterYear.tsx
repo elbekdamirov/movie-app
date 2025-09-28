@@ -1,11 +1,13 @@
-import { Select, ConfigProvider, theme } from "antd";
+import { Select, ConfigProvider } from "antd";
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 export const MovieFilterYear = memo(() => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const selectedYearRange = searchParams.get("year_range") ?? undefined;
+  const { t } = useTranslation();
 
   const handleChange = (value: string | undefined) => {
     if (value) {
@@ -29,7 +31,6 @@ export const MovieFilterYear = memo(() => {
   return (
     <ConfigProvider
       theme={{
-        algorithm: theme.darkAlgorithm,
         token: {
           colorBgElevated: "#000",
           colorText: "#fff",
@@ -50,7 +51,7 @@ export const MovieFilterYear = memo(() => {
     >
       <Select
         className="w-60"
-        placeholder="Filter by year range"
+        placeholder={t("movie_year_sort.title")}
         value={selectedYearRange}
         onChange={handleChange}
         allowClear

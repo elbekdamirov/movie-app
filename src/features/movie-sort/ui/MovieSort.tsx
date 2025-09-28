@@ -1,9 +1,11 @@
 import { Select, ConfigProvider, theme } from "antd";
 import { memo } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const MovieSort = memo(() => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
 
   const handleChange = (value: string) => {
     searchParams.set("sort_by", value);
@@ -34,30 +36,54 @@ export const MovieSort = memo(() => {
     >
       <Select
         className="w-60"
-        placeholder="Sort by"
+        placeholder={t("movieSort.placeholder")}
         allowClear
         onChange={handleChange}
         options={[
-          { value: "popularity.desc", label: "Popularity (High to Low)" },
-          { value: "popularity.asc", label: "Popularity (Low to High)" },
-          { value: "vote_average.desc", label: "Rating (High to Low)" },
-          { value: "vote_average.asc", label: "Rating (Low to High)" },
-          { value: "vote_count.desc", label: "Vote Count (High to Low)" },
-          { value: "vote_count.asc", label: "Vote Count (Low to High)" },
+          {
+            value: "popularity.desc",
+            label: t("movieSort.options.popularityDesc"),
+          },
+          {
+            value: "popularity.asc",
+            label: t("movieSort.options.popularityAsc"),
+          },
+          {
+            value: "vote_average.desc",
+            label: t("movieSort.options.ratingDesc"),
+          },
+          {
+            value: "vote_average.asc",
+            label: t("movieSort.options.ratingAsc"),
+          },
+          {
+            value: "vote_count.desc",
+            label: t("movieSort.options.voteCountDesc"),
+          },
+          {
+            value: "vote_count.asc",
+            label: t("movieSort.options.voteCountAsc"),
+          },
           {
             value: "primary_release_date.desc",
-            label: "Release Date (New to Old)",
+            label: t("movieSort.options.releaseDateDesc"),
           },
           {
             value: "primary_release_date.asc",
-            label: "Release Date (Old to New)",
+            label: t("movieSort.options.releaseDateAsc"),
           },
-          { value: "revenue.desc", label: "Revenue (High to Low)" },
-          { value: "revenue.asc", label: "Revenue (Low to High)" },
-          { value: "title.asc", label: "Title (A to Z)" },
-          { value: "title.desc", label: "Title (Z to A)" },
-          { value: "original_title.asc", label: "Original Title (A to Z)" },
-          { value: "original_title.desc", label: "Original Title (Z to A)" },
+          { value: "revenue.desc", label: t("movieSort.options.revenueDesc") },
+          { value: "revenue.asc", label: t("movieSort.options.revenueAsc") },
+          { value: "title.asc", label: t("movieSort.options.titleAsc") },
+          { value: "title.desc", label: t("movieSort.options.titleDesc") },
+          {
+            value: "original_title.asc",
+            label: t("movieSort.options.originalTitleAsc"),
+          },
+          {
+            value: "original_title.desc",
+            label: t("movieSort.options.originalTitleDesc"),
+          },
         ]}
       />
     </ConfigProvider>

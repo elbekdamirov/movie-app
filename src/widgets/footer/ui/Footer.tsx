@@ -11,11 +11,13 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import playmarket from "@/shared/assets/play.png";
 import footerlogo from "@/shared/assets/logo.svg";
 import appstore from "@/shared/assets/appstore.svg";
+import { useTranslation } from "react-i18next";
 
 export const Footer = memo(() => {
+  const { t } = useTranslation();
   return (
-    <footer className=" dark:text-gray-300 py-10 dark:bg-black">
-      <div className="container mx-auto  rounded-xl px-6 py-10 grid grid-cols-2 sm:justify-center sm:grid-cols-2 md:grid-cols-4 gap-8 dark:bg-[#111111] bg-[#eeecec]">
+    <footer className="dark:text-gray-300 py-10 dark:bg-black">
+      <div className="container mx-auto rounded-xl px-6 py-10 grid grid-cols-2 sm:justify-center sm:grid-cols-2 md:grid-cols-4 gap-8 dark:bg-[#111111] bg-[#eeecec]">
         <div className="space-y-4">
           <img src={footerlogo} alt="footerlogo" className="w-24" />
           <div className="flex flex-col gap-3">
@@ -33,45 +35,55 @@ export const Footer = memo(() => {
         </div>
 
         <div>
-          <h3 className="text-red-500 font-semibold mb-4">About Us</h3>
+          <h3 className="text-red-500 font-semibold mb-4">
+            {t("footer.about.title")}
+          </h3>
           <ul className="space-y-3">
             <li className="flex items-center text-red-700 gap-2 hover:text-red-500 cursor-pointer">
-              <IoDocumentTextOutline /> Public Offer
+              <IoDocumentTextOutline /> {t("footer.about.publicOffer")}
             </li>
             <li className="flex items-center text-red-700 gap-2 hover:text-red-500 cursor-pointer">
-              <RiAdvertisementFill /> Advertising
+              <RiAdvertisementFill /> {t("footer.about.advertising")}
             </li>
             <li className="flex items-center text-red-700 gap-2 hover:text-red-500 cursor-pointer">
-              <FaQuestionCircle /> F.A.Q
+              <FaQuestionCircle /> {t("footer.about.faq")}
             </li>
             <li className="flex items-center text-red-700 gap-2 hover:text-red-500 cursor-pointer">
-              <MdContactPhone /> Contacts
+              <MdContactPhone /> {t("footer.about.contacts")}
             </li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-red-500 font-semibold mb-4">Categories</h3>
+          <h3 className="text-red-500 font-semibold mb-4">
+            {t("footer.categories.title")}
+          </h3>
           <ul className="space-y-3">
             <li className="flex items-center text-red-700 gap-2 hover:text-red-500 cursor-pointer">
-              <MdOutlineLocalMovies /> Movies
+              <MdOutlineLocalMovies /> {t("footer.categories.movies")}
             </li>
             <li className="flex items-center text-red-700 gap-2 hover:text-red-500 cursor-pointer">
-              <MdTheaters /> Theater
+              <MdTheaters /> {t("footer.categories.theater")}
             </li>
             <li className="flex items-center text-red-700 gap-2 hover:text-red-500 cursor-pointer">
-              <TbMicrophone2 /> Concerts
+              <TbMicrophone2 /> {t("footer.categories.concerts")}
             </li>
             <li className="flex items-center text-red-700 gap-2 hover:text-red-500 cursor-pointer">
-              <GiBasketballBall /> Sports
+              <GiBasketballBall /> {t("footer.categories.sports")}
             </li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-red-500 font-semibold mb-4">Contact Us</h3>
-          <p className="text-red-500 font-semibold mb-4">+998 (91) 012-20-77</p>
-          <h3 className="text-red-500 font-semibold mb-3">Follow Us</h3>
+          <h3 className="text-red-500 font-semibold mb-4">
+            {t("footer.contact.title")}
+          </h3>
+          <p className="text-red-500 font-semibold mb-4">
+            {t("footer.contact.phone")}
+          </p>
+          <h3 className="text-red-500 font-semibold mb-3">
+            {t("footer.contact.follow")}
+          </h3>
           <div className="flex text-red-500 space-x-4 text-2xl">
             <a href="#" className="hover:text-red-500">
               <FaInstagram />

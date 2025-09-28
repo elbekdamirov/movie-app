@@ -2,16 +2,18 @@ import { Select, ConfigProvider, theme } from "antd";
 import { memo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useMovie, type IGenre } from "@/entities/movie";
+import { useTranslation } from "react-i18next";
 
 export const MovieFilter = memo(() => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { getGenres } = useMovie();
   const { data } = getGenres();
+  const { t } = useTranslation();
 
-  const selectedGenre = searchParams.get("with_genres") ?? undefined;
+  const selectedGenre = searchParams.get("with_genres") ?? "";
 
-  const handleChange = (value: string | undefined) => {
-    if (value) {
+  const handleChange = (value: string) => {
+    if (value && value !== "") {
       searchParams.set("with_genres", value);
     } else {
       searchParams.delete("with_genres");
@@ -43,14 +45,16 @@ export const MovieFilter = memo(() => {
     >
       <Select
         className="w-60"
-        placeholder="Filter by genre"
+        placeholder={t("FilterGenre")}
         value={selectedGenre}
         onChange={handleChange}
-        allowClear
-        options={data?.genres?.map((g: IGenre) => ({
-          value: String(g.id),
-          label: g.name,
-        }))}
+        options={[
+          { value: "", label: t("All") },
+          ...(data?.genres?.map((g: IGenre) => ({
+            value: String(g.id),
+            label: t(`genres.${g.id}`),
+          })) ?? []),
+        ]}
       />
     </ConfigProvider>
   );

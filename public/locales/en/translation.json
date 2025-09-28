@@ -30,7 +30,9 @@
     }
   },
   "search": {
-    "placeholder": "Search movies"
+    "placeholder": "Search movies",
+    "noResults": "No movies found",
+    "startTyping": "Start typing to search movies"
   },
   "watch": "Watch",
   "movieSort": {
@@ -78,5 +80,12 @@
     "53": "Thriller",
     "10752": "War",
     "37": "Western"
+  },
+
+  "bookmarks": {
+    "title": "Bookmarks",
+    "empty": "Your bookmark list is empty",
+    "startAdding": "Start adding movies to keep them here",
+    "recommendations": "Movies you may like"
   }
 }

@@ -5,6 +5,7 @@ import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 import { createImageUrl } from "@/shared/utils";
 import { FaPlay } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   movies: IMovie[];
@@ -13,6 +14,7 @@ interface Props {
 
 export const Hero: FC<Props> = memo(({ movies, loading }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -82,7 +84,7 @@ export const Hero: FC<Props> = memo(({ movies, loading }) => {
 
                   <button className="bg-white py-4 px-8 text-py font-semibold flex items-center gap-3 rounded-xl cursor-pointer mx-auto hover:bg-gray-100 transition-colors">
                     <FaPlay className="text-lg" />
-                    Смотреть
+                    {t("watch")}
                   </button>
                 </div>
               </div>

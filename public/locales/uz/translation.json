@@ -30,7 +30,9 @@
     }
   },
   "search": {
-    "placeholder": "Filmlar qidirish"
+    "placeholder": "Kinolarni qidirish",
+    "noResults": "Hech qanday kino topilmadi",
+    "startTyping": "Qidirish uchun yozishni boshlang"
   },
   "watch": "Tamosha qilish",
   "movieSort": {
@@ -77,5 +79,12 @@
     "53": "Triller",
     "10752": "Urush",
     "37": "Vester"
+  },
+
+  "bookmarks": {
+    "title": "Saqlanganlar",
+    "empty": "Saqlangan filmlar ro‘yxati bo‘sh",
+    "startAdding": "Filmlarni qo‘shib, ularni shu yerda saqlang",
+    "recommendations": "Sizga yoqishi mumkin bo‘lgan filmlar"
   }
 }

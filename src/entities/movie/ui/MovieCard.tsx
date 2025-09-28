@@ -8,13 +8,29 @@ import type { RootState } from "@/app/store";
 import { toggleBookmark } from "../model/bookmarkSlice";
 
 interface Props {
-  movie: IMovie;
+  movie?: IMovie;
+  loading?: boolean;
 }
 
-export const MovieCard: FC<Props> = memo(({ movie }) => {
+export const MovieCard: FC<Props> = memo(({ movie, loading = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const saved = useSelector((state: RootState) => state.bookmarks.saved);
+
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-black font-medium relative animate-pulse">
+        <div className="rounded-xl bg-gray-300 dark:bg-gray-700 h-[400px] w-full" />
+        <div className="p-3 space-y-2">
+          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4" />
+          <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2" />
+          <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/4" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!movie) return null;
 
   const isSaved = saved.some((m) => m.id === movie.id);
 
@@ -30,7 +46,7 @@ export const MovieCard: FC<Props> = memo(({ movie }) => {
         onClick={() => navigate(`/movie/${movie.id}`)}
       >
         <img
-          className="rounded-xl"
+          className="rounded-xl w-full h-[400px] object-cover"
           src={createImageUrl(movie.poster_path)}
           alt={movie.title}
         />

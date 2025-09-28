@@ -8,11 +8,30 @@ import { FaPlay } from "react-icons/fa";
 
 interface Props {
   movies: IMovie[];
+  loading: boolean;
 }
 
-export const Hero: FC<Props> = memo(({ movies }) => {
+export const Hero: FC<Props> = memo(({ movies, loading }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
-  console.log(movies);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4">
+        <div className="mb-1">
+          <div className="w-full h-[640px] rounded-xl bg-gray-300 dark:bg-gray-700 animate-pulse" />
+        </div>
+
+        <div className="max-w-2xl mx-auto flex gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-[108px] h-[64px] rounded-lg bg-gray-300 dark:bg-gray-700 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4">

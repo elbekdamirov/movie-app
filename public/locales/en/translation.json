@@ -1,0 +1,82 @@
+{
+  "header": {
+    "nav": {
+      "main": "Home",
+      "movies": "Movies",
+      "saved": "Saved",
+      "search": "Search",
+      "login": "Login"
+    }
+  },
+  "footer": {
+    "about": {
+      "title": "About Us",
+      "publicOffer": "Public Offer",
+      "advertising": "Advertising",
+      "faq": "FAQ",
+      "contacts": "Contacts"
+    },
+    "categories": {
+      "title": "Categories",
+      "movies": "Movies",
+      "theater": "Theater",
+      "concerts": "Concerts",
+      "sports": "Sports"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "phone": "+998 (91) 012-20-77",
+      "follow": "Follow us"
+    }
+  },
+  "search": {
+    "placeholder": "Search movies"
+  },
+  "watch": "Watch",
+  "movieSort": {
+    "placeholder": "Sort by",
+    "options": {
+      "popularityDesc": "Popularity (High to Low)",
+      "popularityAsc": "Popularity (Low to High)",
+      "ratingDesc": "Rating (High to Low)",
+      "ratingAsc": "Rating (Low to High)",
+      "voteCountDesc": "Vote Count (High to Low)",
+      "voteCountAsc": "Vote Count (Low to High)",
+      "releaseDateDesc": "Release Date (New to Old)",
+      "releaseDateAsc": "Release Date (Old to New)",
+      "revenueDesc": "Revenue (High to Low)",
+      "revenueAsc": "Revenue (Low to High)",
+      "titleAsc": "Title (A to Z)",
+      "titleDesc": "Title (Z to A)",
+      "originalTitleAsc": "Original Title (A to Z)",
+      "originalTitleDesc": "Original Title (Z to A)"
+    }
+  },
+  "movie_year_sort": {
+    "title": "Filter by year range"
+  },
+  "FilterGenre": "Filter by genre",
+  "All": "All",
+
+  "genres": {
+    "28": "Action",
+    "12": "Adventure",
+    "16": "Animation",
+    "35": "Comedy",
+    "80": "Crime",
+    "99": "Documentary",
+    "18": "Drama",
+    "10751": "Family",
+    "14": "Fantasy",
+    "36": "History",
+    "27": "Horror",
+    "10402": "Music",
+    "9648": "Mystery",
+    "10749": "Romance",
+    "878": "Science Fiction",
+    "10770": "TV Movie",
+    "53": "Thriller",
+    "10752": "War",
+    "37": "Western"
+  }
+}

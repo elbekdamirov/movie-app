@@ -27,7 +27,7 @@ export const Movie = memo(() => {
     }
   }
 
-  const { data } = getMovies({
+  const { data, isLoading, isError } = getMovies({
     page: page as string,
     sort_by,
     with_genres,
@@ -47,7 +47,12 @@ export const Movie = memo(() => {
             <MovieFilter />
           </div>
         </div>
-        <MovieList movies={data?.results} />
+
+        {isError ? (
+          <p className="text-red-500">Something went wrong</p>
+        ) : (
+          <MovieList movies={data?.results} loading={isLoading} />
+        )}
         <div className="flex justify-center pt-4">
           <MoviePagination page={page} total_pages={data?.total_pages} />
         </div>

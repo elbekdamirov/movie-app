@@ -1,0 +1,81 @@
+{
+  "header": {
+    "nav": {
+      "main": "Asosiy",
+      "movies": "Filmlar",
+      "saved": "Saqlangan",
+      "search": "Qidiruv",
+      "login": "Kirish"
+    }
+  },
+  "footer": {
+    "about": {
+      "title": "Biz haqimizda",
+      "publicOffer": "Ommaviy oferta",
+      "advertising": "Reklama",
+      "faq": "Savol-Javob",
+      "contacts": "Aloqa"
+    },
+    "categories": {
+      "title": "Kategoriyalar",
+      "movies": "Filmlar",
+      "theater": "Teatr",
+      "concerts": "Konsertlar",
+      "sports": "Sport"
+    },
+    "contact": {
+      "title": "Biz bilan bog‘laning",
+      "phone": "+998 (91) 012-20-77",
+      "follow": "Bizni kuzating"
+    }
+  },
+  "search": {
+    "placeholder": "Filmlar qidirish"
+  },
+  "watch": "Tamosha qilish",
+  "movieSort": {
+    "placeholder": "Saralash",
+    "options": {
+      "popularityDesc": "Ommaboplik (Yuqoridan Pastga)",
+      "popularityAsc": "Ommaboplik (Pastdan Yuqoriga)",
+      "ratingDesc": "Reyting (Yuqoridan Pastga)",
+      "ratingAsc": "Reyting (Pastdan Yuqoriga)",
+      "voteCountDesc": "Ovozlar soni (Ko‘pdan Kamga)",
+      "voteCountAsc": "Ovozlar soni (Kamdan Ko‘pga)",
+      "releaseDateDesc": "Chiqarilish sanasi (Yangi — Eski)",
+      "releaseDateAsc": "Chiqarilish sanasi (Eski — Yangi)",
+      "revenueDesc": "Daromad (Ko‘pdan Kamga)",
+      "revenueAsc": "Daromad (Kamdan Ko‘pga)",
+      "titleAsc": "Sarlavha (A dan Z gacha)",
+      "titleDesc": "Sarlavha (Z dan A gacha)",
+      "originalTitleAsc": "Asl sarlavha (A dan Z gacha)",
+      "originalTitleDesc": "Asl sarlavha (Z dan A gacha)"
+    }
+  },
+  "movie_year_sort": {
+    "title": "Yil bo‘yicha filter"
+  },
+  "FilterGenre": "Janr bo‘yicha filter",
+  "All": "Barchasi",
+  "genres": {
+    "28": "Harakat",
+    "12": "Sarguzasht",
+    "16": "Animatsiya",
+    "35": "Komediya",
+    "80": "Jinoyat",
+    "99": "Hujjatli",
+    "18": "Drama",
+    "10751": "Oila",
+    "14": "Fantaziya",
+    "36": "Tarix",
+    "27": "Qo‘rqinchli",
+    "10402": "Musiqa",
+    "9648": "Siril",
+    "10749": "Romantika",
+    "878": "Ilmiy-fantastika",
+    "10770": "TV filmi",
+    "53": "Triller",
+    "10752": "Urush",
+    "37": "Vester"
+  }
+}

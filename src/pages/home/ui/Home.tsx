@@ -10,7 +10,9 @@ export const Home = memo(() => {
   return (
     <div className="">
       <Hero movies={data?.results?.slice(0, 6)} loading={isLoading} />
-      <MovieList movies={data?.results?.slice(0, 8)} loading={isLoading} />
+      <div className="mt-15">
+        <MovieList movies={data?.results?.slice(0, 8)} loading={isLoading} />
+      </div>
     </div>
   );
 });

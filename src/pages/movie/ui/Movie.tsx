@@ -37,11 +37,11 @@ export const Movie = memo(() => {
   return (
     <div className="py-6">
       <div className="container space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex gap-10 items-center flex-col-reverse md:flex-row md:justify-between">
           <h2 className="text-xl font-semibold">
             Total: {data?.total_results?.toLocaleString()}
           </h2>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap md:flex-nowrap gap-4 justify-end w-full md:w-auto">
             <MovieFilterYear />
             <MovieSort />
             <MovieFilter />

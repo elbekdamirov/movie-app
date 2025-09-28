@@ -7,7 +7,6 @@ export const CrewView = memo(() => {
   const { id } = useParams();
   const { getCrewById } = useCrew();
   const { data } = getCrewById(id as string);
-  console.log(data);
 
   if (!data) {
     return <div className="container py-10 text-center">No data found</div>;

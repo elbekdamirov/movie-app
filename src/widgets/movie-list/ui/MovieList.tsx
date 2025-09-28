@@ -8,7 +8,7 @@ interface Props {
 
 export const MovieList: FC<Props> = memo(({ movies = [], loading }) => {
   return (
-    <div className="container grid lg:grid-cols-4 gap-3 md:grid-cols-3 grid-cols-2 py-15">
+    <div className="container grid lg:grid-cols-4 gap-3 md:grid-cols-3 grid-cols-2">
       {loading
         ? Array.from({ length: 8 }).map((_, i) => <MovieCard key={i} loading />)
         : movies.map((item: IMovie) => (

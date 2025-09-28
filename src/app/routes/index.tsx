@@ -10,6 +10,7 @@ const Review = lazy(() => import("@/pages/movie-detail/review"));
 const Others = lazy(() => import("@/pages/movie-detail/others"));
 const CrewDetail = lazy(() => import("@/pages/crew-detail"));
 const Login = lazy(() => import("@/pages/login"));
+const NotFound = lazy(() => import("@/pages/notfound"));
 
 const MovieDetail = lazy(() => import("@/pages/movie-detail"));
 
@@ -43,6 +44,7 @@ const AppRouter = () => {
           ],
         },
         { path: "/crew/:id", element: <CrewDetail /> },
+        { path: "*", element: <NotFound /> },
       ],
     },
   ]);

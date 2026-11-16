@@ -1,13 +1,9 @@
 import { ReviewView } from "@/entities/review";
+import type { MediaType } from "@/entities/movie";
 import { memo } from "react";
-import { useParams } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 export const Review = memo(() => {
-  const { id } = useParams();
-
-  return (
-    <div>
-      <ReviewView id={id as string} />
-    </div>
-  );
+  const { id, type } = useOutletContext<{ id: string; type: MediaType }>();
+  return <ReviewView id={id} mediaType={type} />;
 });

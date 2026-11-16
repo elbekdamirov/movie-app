@@ -1,60 +1,46 @@
 import { memo, type FC } from "react";
-import { useCast } from "../model/useCast";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import type { MediaType } from "@/entities/movie";
+import { StatusMessage } from "@/shared/ui";
 import { createUserImageUrl } from "@/shared/utils";
-import { useNavigate } from "react-router-dom";
+import { useCast } from "../model/useCast";
 
 interface Props {
   id: string;
-  type: string;
+  type: "cast" | "crew";
+  mediaType: MediaType;
 }
 
-export const CastView: FC<Props> = memo((props) => {
-  const { id, type } = props;
+export const CastView: FC<Props> = memo(({ id, type, mediaType }) => {
+  const { t } = useTranslation();
   const { getCasts } = useCast();
-  const { data, isLoading } = getCasts(id);
-  const navigate = useNavigate();
+  const { data, isPending, isError, refetch } = getCasts(id, mediaType);
+  const credits = data?.[type];
 
-  if (isLoading) {
+  if (isPending) {
     return (
-      <div className="container flex overflow-x-auto gap-4">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div
-            key={index}
-            className="mt-5 p-4 rounded-2xl bg-white dark:bg-gray-950"
-          >
-            <div className="min-w-[150px] h-[225px] rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
-            <div className="mt-2 h-4 w-32 rounded bg-gray-200 dark:bg-gray-800 animate-pulse" />
-            <div className="mt-1 h-3 w-20 rounded bg-gray-200 dark:bg-gray-800 animate-pulse" />
-          </div>
+      <div className="container flex gap-3 overflow-hidden pt-5" aria-busy="true">
+        {Array.from({ length: 6 }, (_, index) => (
+          <div key={index} className="credit-card h-52 shrink-0 bg-black/5 dark:bg-white/5 motion-safe:animate-pulse" />
         ))}
       </div>
     );
   }
+  if (isError) return <StatusMessage message={t("catalog.loadError")} onRetry={() => void refetch()} />;
+  if (!credits?.length) return <StatusMessage message={t("media.noCredits")} />;
 
   return (
-    <div className="container flex overflow-x-auto gap-4 cursor-pointer">
-      {data &&
-        data[type]?.map((item: any, index: number) => (
-          <div
-            onClick={() => navigate(`/crew/${item.id}`)}
-            key={index}
-            className="mt-5 p-4 rounded-2xl
-                       bg-white dark:bg-gray-950 
-                       hover:bg-gray-50 dark:hover:bg-gray-900"
-          >
-            <img
-              className="min-w-[150px] rounded-2xl h-50"
-              src={createUserImageUrl(item.profile_path)}
-              alt={item.original_name}
-            />
-            <h3 className="mt-2 font-medium text-gray-900 dark:text-gray-100">
-              {item.original_name}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {type === "cast" ? item.character : item.job}
-            </p>
+    <div className="container flex gap-3 overflow-x-auto pt-5 pb-3">
+      {credits.map((person) => (
+        <Link to={`/crew/${person.id}`} className="credit-card" key={person.credit_id}>
+          <img src={createUserImageUrl(person.profile_path)} alt="" loading="lazy" className="aspect-[4/5] w-full object-cover" />
+          <div className="p-3">
+            <h3 className="text-sm font-semibold">{person.name}</h3>
+            <p className="muted text-xs">{type === "cast" ? person.character : person.job}</p>
           </div>
-        ))}
+        </Link>
+      ))}
     </div>
   );
 });

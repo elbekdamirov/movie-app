@@ -1,11 +1,14 @@
-import type { IMovie } from "@/entities/movie";
-import { memo, useState, type FC } from "react";
+import { getMediaPath, SaveTitleButton, type IMovie } from "@/entities/movie";
+import { memo, useRef, useState, type FC } from "react";
+import type { Swiper as SwiperInstance } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode, Navigation, Thumbs } from "swiper/modules";
+import { A11y } from "swiper/modules";
 import "swiper/swiper-bundle.css";
-import { createImageUrl } from "@/shared/utils";
-import { FaPlay } from "react-icons/fa";
+import { createImageUrl, getReleaseYear } from "@/shared/utils";
+import { FaPlay, FaStar } from "react-icons/fa";
+import { HiArrowLeft, HiArrowRight } from "react-icons/hi2";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 interface Props {
   movies: IMovie[];
@@ -13,127 +16,89 @@ interface Props {
 }
 
 export const Hero: FC<Props> = memo(({ movies, loading }) => {
-  const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+  const swiper = useRef<SwiperInstance>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const { t } = useTranslation();
+  const active = Math.min(activeIndex, movies.length - 1);
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4">
-        <div className="mb-1">
-          <div className="w-full h-[640px] rounded-xl bg-gray-300 dark:bg-gray-700 animate-pulse" />
-        </div>
-
-        <div className="max-w-2xl mx-auto flex gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="w-[108px] h-[64px] rounded-lg bg-gray-300 dark:bg-gray-700 animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="hero-shell hero-skeleton motion-safe:animate-pulse" aria-hidden="true" />;
+  if (!movies.length) return null;
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="mb-1">
-        <Swiper
-          style={
-            {
-              "--swiper-navigation-color": "#fff",
-              "--swiper-pagination-color": "#fff",
-              borderRadius: "12px",
-              maxHeight: "640px",
-              width: "100%",
-              height: "640px",
-            } as React.CSSProperties
-          }
-          loop
-          spaceBetween={10}
-          navigation
-          thumbs={{ swiper: thumbsSwiper }}
-          modules={[FreeMode, Navigation, Thumbs]}
-          className="mySwiper2"
-        >
-          {movies?.map((movie) => (
-            <SwiperSlide key={movie.id}>
-              <div
-                className="w-full h-full rounded-xl bg-cover bg-center bg-no-repeat flex items-end justify-center p-6"
-                style={{
-                  backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${createImageUrl(
-                    movie?.backdrop_path
-                  )})`,
-                }}
-                title={movie.title}
-              >
-                <div className="text-center max-w-4xl px-6">
-                  <h2 className="text-white text-4xl font-bold drop-shadow-lg mb-4">
-                    {movie.title}
-                  </h2>
-
-                  <div className="flex items-center justify-center gap-4 mb-6">
-                    <span className="text-white/90 text-xl font-medium">
-                      {new Date(movie.release_date).getFullYear()}
-                    </span>
-                    <span className="text-white/70 text-2xl">•</span>
-                    <span className="text-white/90 text-xl uppercase tracking-wide">
-                      {movie.original_language}
-                    </span>
+    <section className="hero-shell relative isolate overflow-hidden" aria-label={t("catalog.featured")}>
+      <Swiper
+        onSwiper={(instance) => { swiper.current = instance; }}
+        onSlideChange={(instance) => setActiveIndex(instance.activeIndex)}
+        modules={[A11y]}
+        rewind
+        className="hero-swiper"
+      >
+        {movies.map((movie, index) => (
+          <SwiperSlide key={movie.id}>
+            <div className="hero-slide">
+              <img
+                className="hero-image"
+                src={createImageUrl(movie.backdrop_path, "w1280")}
+                srcSet={`${createImageUrl(movie.backdrop_path, "w780")} 780w, ${createImageUrl(movie.backdrop_path, "w1280")} 1280w`}
+                sizes="100vw"
+                alt=""
+                fetchPriority={index === 0 ? "high" : "low"}
+                loading={index === 0 ? "eager" : "lazy"}
+              />
+              <div className="container hero-content">
+                <div className="hero-copy" inert={index !== active}>
+                  <div className="hero-kicker">{t("catalog.featured")}</div>
+                  <h2>{movie.title}</h2>
+                  <p className="hero-meta">
+                    {movie.vote_count > 0 && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <FaStar className="text-amber-300" aria-hidden="true" />
+                        {movie.vote_average.toFixed(1)}
+                      </span>
+                    )}
+                    {getReleaseYear(movie.release_date)}
+                    <span>{t("media.movie")}</span>
+                  </p>
+                  {movie.overview && <p className="hero-overview">{movie.overview}</p>}
+                  <div className="hero-actions">
+                    <Link className="action action-primary" to={`${getMediaPath(movie)}?play=1`}>
+                      <FaPlay className="size-3" aria-hidden="true" /> {t("watch")}
+                    </Link>
+                    <Link className="action action-on-image" to={getMediaPath(movie)}>
+                      {t("media.details")}
+                    </Link>
+                    <SaveTitleButton movie={movie} hero />
                   </div>
-
-                  <button className="bg-white py-4 px-8 text-py font-semibold flex items-center gap-3 rounded-xl cursor-pointer mx-auto hover:bg-gray-100 transition-colors">
-                    <FaPlay className="text-lg" />
-                    {t("watch")}
-                  </button>
                 </div>
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
-      <div className="max-w-2xl mx-auto">
-        <Swiper
-          onSwiper={setThumbsSwiper}
-          loop
-          spaceBetween={10}
-          slidesPerView={6}
-          freeMode
-          watchSlidesProgress
-          modules={[FreeMode, Navigation, Thumbs]}
-          breakpoints={{
-            320: {
-              slidesPerView: 3,
-            },
-            640: {
-              slidesPerView: 4,
-            },
-            768: {
-              slidesPerView: 5,
-            },
-            1024: {
-              slidesPerView: 6,
-            },
-          }}
-          className="thumbs-swiper"
-        >
-          {movies?.map((movie) => (
-            <SwiperSlide key={movie.id} className="cursor-pointer">
-              <div
-                className="w-[108px] h-[64px] overflow-hidden rounded-lg mx-auto"
-                title={movie.title}
+      {movies.length > 1 && (
+        <div className="container hero-controls">
+          <div className="hero-thumbs">
+            {movies.map((movie, index) => (
+              <button
+                type="button"
+                key={movie.id}
+                aria-label={movie.title}
+                aria-pressed={index === active}
+                onClick={() => swiper.current?.slideTo(index)}
               >
-                <img
-                  src={createImageUrl(movie.backdrop_path)}
-                  alt={movie.title}
-                  className="w-full h-full object-cover hover:opacity-80 transition-opacity"
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </div>
+                <img src={createImageUrl(movie.backdrop_path, "w300")} alt="" />
+              </button>
+            ))}
+          </div>
+          <button type="button" className="hero-arrow" aria-label={t("catalog.previousSlide")} onClick={() => swiper.current?.slidePrev()}>
+            <HiArrowLeft aria-hidden="true" />
+          </button>
+          <button type="button" className="hero-arrow" aria-label={t("catalog.nextSlide")} onClick={() => swiper.current?.slideNext()}>
+            <HiArrowRight aria-hidden="true" />
+          </button>
+        </div>
+      )}
+    </section>
   );
 });

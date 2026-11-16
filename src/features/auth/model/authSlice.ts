@@ -1,31 +1,47 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-interface IAuth {
-  credential: string | null;
-  user: any;
+export interface UserProfile {
+  name?: string | null;
+  email?: string | null;
+  picture?: string | null;
+  expiresAt?: number;
 }
 
-const user = localStorage.getItem("auth-user");
-
-const initialState: IAuth = {
-  credential: null,
-  user: user ? JSON.parse(user) : null,
+const loadUser = (): UserProfile | null => {
+  try {
+    const cached = JSON.parse(localStorage.getItem("auth-user") ?? "null");
+    if (!cached || typeof cached !== "object") return null;
+    const expiry = cached.expiresAt ?? cached.exp;
+    if (typeof expiry === "number" && expiry * 1000 <= Date.now()) return null;
+    return cached;
+  } catch {
+    return null;
+  }
 };
+
+const initialState: { user: UserProfile | null } = { user: loadUser() };
 
 export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<any>) => {
+    setUser: (state, action: PayloadAction<UserProfile>) => {
       state.user = action.payload;
-      localStorage.setItem("auth-user", JSON.stringify(state.user));
+      try {
+        localStorage.setItem("auth-user", JSON.stringify(action.payload));
+      } catch {
+        // The active session can still use its in-memory profile.
+      }
     },
     logout: (state) => {
       state.user = null;
-      localStorage.removeItem("auth-user");
+      try {
+        localStorage.removeItem("auth-user");
+      } catch {
+        // The in-memory profile was already cleared.
+      }
     },
   },
 });
 
 export const { setUser, logout } = authSlice.actions;
-export default authSlice.reducer;

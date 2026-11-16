@@ -1,216 +1,107 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useState } from "react";
 import logo from "@/shared/assets/logo.svg";
-import { BsDisplayFill } from "react-icons/bs";
-import { NavLink, useNavigate } from "react-router-dom";
-import { IoSearch } from "react-icons/io5";
-import { BiSolidMoviePlay } from "react-icons/bi";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
-import { FaRegBookmark } from "react-icons/fa";
+import {
+  HiOutlineBookmark, HiOutlineFilm, HiOutlineHome,
+  HiOutlineTrophy, HiOutlineTv, HiOutlineUserCircle,
+} from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { Dropdown, Select, type MenuProps } from "antd";
+import { Dropdown, type MenuProps } from "antd";
+import { AppSelect } from "@/shared/ui";
 import { logout } from "@/features/auth";
+import { HeaderSearch } from "@/features/search-movie/ui/HeaderSearch";
 import { useTranslation } from "react-i18next";
-import i18n from "@/app/i18n";
 
-export const Header = memo(() => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+const catalogLinks = [
+  { to: "/", label: "main", icon: HiOutlineHome },
+  { to: "/movie", label: "movies", icon: HiOutlineFilm },
+  { to: "/tv", label: "series", icon: HiOutlineTv },
+  { to: "/awards", label: "awards", icon: HiOutlineTrophy },
+  { to: "/my-list", label: "myList", icon: HiOutlineBookmark },
+];
+
+export const Header = memo(({ isDark, overHero, onToggleTheme }: { isDark: boolean; overHero: boolean; onToggleTheme: () => void }) => {
+  const { t, i18n } = useTranslation();
+  const { pathname } = useLocation();
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
+  const [openMenuPath, setOpenMenuPath] = useState<string | null>(null);
+  const isMobileMenuOpen = openMenuPath === pathname;
 
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    return saved ? saved === "dark" : true;
-  });
-
-  const handleLogout = () => {
-    dispatch(logout());
-  };
-
-  const items: MenuProps["items"] = [
-    { key: "1", label: <a href="/profile">Profile</a> },
-    {
-      key: "2",
-      label: <span onClick={handleLogout}>Logout</span>,
-    },
+  const accountItems: MenuProps["items"] = [
+    { key: "account", label: user?.name || user?.email, disabled: true },
+    { key: "logout", label: t("header.nav.logout"), onClick: () => dispatch(logout()) },
   ];
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDark]);
-
-  const toggleTheme = () => setIsDark(!isDark);
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const closeMenu = () => setOpenMenuPath(null);
+  const themeLabel = t(isDark ? "header.nav.light" : "header.nav.dark");
+  const renderNav = () => catalogLinks.map(({ to, label, icon: Icon }) => (
+    <NavLink key={to} to={to} end={to === "/"} className="header-link" onClick={closeMenu}>
+      <Icon aria-hidden="true" />
+      {t(`header.nav.${label}`)}
+    </NavLink>
+  ));
 
   return (
-    <header
-      className={`h-20 flex items-center ${
-        isDark ? "bg-black" : "bg-white shadow-md"
-      }`}
-    >
-      <div className="container flex justify-between items-center">
-        <div className="flex-shrink-0">
-          <NavLink to={"/"}>
-            <img src={logo} alt="logo" className="h-8 md:h-10" />
-          </NavLink>
-        </div>
+    <header className={`site-header${overHero ? " site-header--hero" : ""}`}>
+      <div className="container header-inner">
+        <Link to="/" aria-label={t("header.nav.main")} className="shrink-0" onClick={closeMenu}>
+          <img src={logo} alt="" className="header-logo w-[88px] sm:w-[108px]" />
+        </Link>
 
-        <div
-          className={`hidden lg:flex gap-6 xl:gap-[37px] ${
-            isDark ? "text-[#A1A1A1]" : "text-gray-600"
-          }`}
-        >
-          <NavLink
-            to={"/"}
-            className={({ isActive }) =>
-              `flex flex-col items-center ${isActive && "text-py"}`
-            }
-          >
-            <BsDisplayFill size={25} />
-            <span className="text-sm">{t("header.nav.main")}</span>
-          </NavLink>
+        <nav className="main-navigation hidden lg:flex" aria-label={t("header.nav.navigation")}>
+          {renderNav()}
+        </nav>
 
-          <NavLink
-            to={"/movie"}
-            className={({ isActive }) =>
-              `flex flex-col items-center ${isActive && "text-py"}`
-            }
-          >
-            <BiSolidMoviePlay size={25} />
-            <span className="text-sm">{t("header.nav.movies")}</span>
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:ml-0">
+          <HeaderSearch onOpen={closeMenu} />
+          <NavLink to="/my-list" className="header-icon header-shortcut hidden! sm:grid! lg:hidden!" aria-label={t("header.nav.myList")} title={t("header.nav.myList")} onClick={closeMenu}>
+            <HiOutlineBookmark aria-hidden="true" />
           </NavLink>
-
-          <NavLink
-            to={"/bookmark"}
-            className={({ isActive }) =>
-              `flex flex-col items-center ${isActive && "text-py"}`
-            }
-          >
-            <FaRegBookmark size={25} />
-            <span className="text-sm">{t("header.nav.saved")}</span>
-          </NavLink>
-
-          <NavLink
-            to={"/search"}
-            className={({ isActive }) =>
-              `flex flex-col items-center ${isActive && "text-py"}`
-            }
-          >
-            <IoSearch size={25} />
-            <span className="text-sm">{t("header.nav.search")}</span>
-          </NavLink>
-        </div>
-
-        <div className="flex items-center gap-2 md:gap-4">
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-full transition-colors ${
-              isDark
-                ? "text-yellow-400 hover:bg-gray-800"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDark ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}
+          <button type="button" className="header-icon" aria-label={themeLabel} title={themeLabel} onClick={onToggleTheme}>
+            {isDark ? <MdLightMode aria-hidden="true" /> : <MdDarkMode aria-hidden="true" />}
           </button>
-
-          <Select
-            className="language-select"
-            value={i18n.language}
-            style={{ width: 100 }}
-            onChange={(lng) => i18n.changeLanguage(lng)}
+          <AppSelect<string>
+            className="header-language"
+            aria-label={t("header.nav.language")}
+            value={i18n.resolvedLanguage || "en"}
+            onChange={(language) => void i18n.changeLanguage(language)}
+            popupMatchSelectWidth={112}
             options={[
-              { value: "uz", label: "UZ" },
-              { value: "ru", label: "RU" },
               { value: "en", label: "EN" },
+              { value: "ru", label: "RU" },
+              { value: "uz", label: "UZ" },
             ]}
           />
-
           {user ? (
-            <Dropdown menu={{ items }} placement="bottomLeft">
-              <img
-                className="size-10 rounded-full cursor-pointer"
-                src={user.picture}
-                alt="user"
-              />
+            <Dropdown menu={{ items: accountItems }} trigger={["click"]} placement="bottomRight">
+              <button type="button" className="header-icon overflow-hidden" aria-label={t("header.nav.account")}>
+                {user.picture
+                  ? <img className="size-full rounded-full object-cover" src={user.picture} alt="" referrerPolicy="no-referrer" />
+                  : <HiOutlineUserCircle aria-hidden="true" />}
+              </button>
             </Dropdown>
           ) : (
-            <button
-              onClick={() => navigate("/login")}
-              className="py-2 px-4 md:py-4 md:px-16 bg-py text-white rounded-[12px] hover:bg-py/80 transition-colors cursor-pointer text-sm md:text-base"
-            >
-              {t("header.nav.login")}
-            </button>
+            <Link to="/login" className="action action-primary header-login" onClick={closeMenu}>{t("header.nav.login")}</Link>
           )}
-
           <button
-            onClick={toggleMobileMenu}
-            className={`p-2 lg:hidden ${
-              isDark ? "text-white" : "text-gray-800"
-            }`}
+            type="button"
+            className="header-icon lg:hidden!"
+            aria-label={t("header.nav.navigation")}
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setOpenMenuPath(isMobileMenuOpen ? null : pathname)}
           >
-            {isMobileMenuOpen ? <HiX size={24} /> : <HiMenuAlt3 size={24} />}
+            {isMobileMenuOpen ? <HiX aria-hidden="true" /> : <HiMenuAlt3 aria-hidden="true" />}
           </button>
         </div>
       </div>
-
       {isMobileMenuOpen && (
-        <div
-          className={`absolute top-20 left-0 right-0 z-50 lg:hidden ${
-            isDark
-              ? "bg-black border-gray-700 text-white"
-              : "bg-white border-gray-200"
-          } border-t shadow-lg`}
-        >
-          <div className="py-4 space-y-4">
-            <NavLink
-              to={"/"}
-              onClick={closeMobileMenu}
-              className="flex items-center gap-3 p-2"
-            >
-              <BsDisplayFill size={20} />
-              <span>{t("header.nav.main")}</span>
-            </NavLink>
-
-            <NavLink
-              to={"/movie"}
-              onClick={closeMobileMenu}
-              className="flex items-center gap-3 p-2"
-            >
-              <BiSolidMoviePlay size={20} />
-              <span>{t("header.nav.movies")}</span>
-            </NavLink>
-
-            <NavLink
-              to={"/bookmark"}
-              onClick={closeMobileMenu}
-              className="flex items-center gap-3 p-2"
-            >
-              <FaRegBookmark size={20} />
-              <span>{t("header.nav.saved")}</span>
-            </NavLink>
-
-            <NavLink
-              to={"/search"}
-              onClick={closeMobileMenu}
-              className="flex items-center gap-3 p-2"
-            >
-              <IoSearch size={20} />
-              <span>{t("header.nav.search")}</span>
-            </NavLink>
-          </div>
-        </div>
+        <nav className="mobile-menu lg:hidden" aria-label={t("header.nav.navigation")}>
+          <div className="container grid gap-1">{renderNav()}</div>
+        </nav>
       )}
     </header>
   );

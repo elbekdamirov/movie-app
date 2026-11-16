@@ -1,105 +1,65 @@
-import { memo } from "react";
-import { useCrew } from "../model/useCrew";
-import { useParams } from "react-router-dom";
-import { createImageUrl } from "@/shared/utils";
+import { memo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { HiArrowUpRight, HiOutlineCalendarDays, HiOutlineMapPin } from "react-icons/hi2";
+import { createImageUrl, createUserImageUrl } from "@/shared/utils";
+import type { IPerson } from "../model/types";
 
-export const CrewView = memo(() => {
-  const { id } = useParams();
-  const { getCrewById } = useCrew();
-  const { data } = getCrewById(id as string);
-
-  if (!data) {
-    return <div className="container py-10 text-center">No data found</div>;
-  }
+export const CrewView = memo(({ person }: { person: IPerson }) => {
+  const { t, i18n } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const department = person.known_for_department;
+  const formatDate = (date: string) => new Intl.DateTimeFormat(i18n.resolvedLanguage, {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  }).format(new Date(date));
 
   return (
-    <div className="container grid md:grid-cols-3 gap-8 py-10">
-      <div className="flex justify-center">
-        {data.profile_path ? (
-          <img
-            src={createImageUrl(data.profile_path)}
-            alt={data.name}
-            className="rounded-2xl shadow-lg max-h-150"
-          />
-        ) : (
-          <div className="w-72 h-96 flex items-center justify-center bg-gray-200 dark:bg-gray-800 rounded-2xl">
-            <span className="text-gray-500">No Image</span>
+    <section className="container" aria-labelledby="person-name">
+      <div className="person-profile">
+        <img
+          src={person.profile_path ? createImageUrl(person.profile_path, "w500") : createUserImageUrl(null)}
+          className="person-portrait"
+          alt=""
+          fetchPriority="high"
+        />
+        <div className="person-copy">
+          {department && <p className="muted text-sm font-semibold">{t(`people.department.${department}`, { defaultValue: department })}</p>}
+          <h1 id="person-name" className="page-title">{person.name}</h1>
+          <div className="person-facts">
+            {person.birthday && (
+              <span><HiOutlineCalendarDays aria-hidden="true" /> {formatDate(person.birthday)}{person.deathday && ` – ${formatDate(person.deathday)}`}</span>
+            )}
+            {person.place_of_birth && <span><HiOutlineMapPin aria-hidden="true" />{person.place_of_birth}</span>}
           </div>
-        )}
-      </div>
 
-      <div className="md:col-span-2 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">{data.name}</h1>
-          <p className="text-gray-500">{data.known_for_department}</p>
-
-          {data.also_known_as?.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {data.also_known_as.map((alias: string) => (
-                <span
-                  key={alias}
-                  className="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
-                >
-                  {alias}
-                </span>
-              ))}
+          {person.biography && (
+            <div className="mt-5">
+              <h2 className="mb-2 text-lg font-semibold">{t("people.biography")}</h2>
+              <p className={`person-biography ${!expanded && person.biography.length > 425 ? "line-clamp-4" : ""}`} id="person-biography">
+                {person.biography}
+              </p>
+              {person.biography.length > 425 && (
+                <button type="button" className="section-link mt-2" aria-controls="person-biography" aria-expanded={expanded} onClick={() => setExpanded((open) => !open)}>
+                  {t(expanded ? "media.readLess" : "media.readMore")}
+                </button>
+              )}
             </div>
           )}
-        </div>
 
-        <div className="space-y-2 text-sm">
-          <p>
-            <span className="font-semibold">Birthday:</span>{" "}
-            {data.birthday || "Unknown"}
-          </p>
-          {data.deathday && (
-            <p>
-              <span className="font-semibold">Deathday:</span> {data.deathday}
-            </p>
-          )}
-          <p>
-            <span className="font-semibold">Place of Birth:</span>{" "}
-            {data.place_of_birth || "Unknown"}
-          </p>
-          <p>
-            <span className="font-semibold">Popularity:</span>{" "}
-            {data.popularity?.toFixed(1)}
-          </p>
-          {data.homepage && (
-            <p>
-              <span className="font-semibold">Homepage:</span>{" "}
-              <a
-                href={data.homepage}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline"
-              >
-                {data.homepage}
+          <div className="mt-4 flex flex-wrap gap-4">
+            {/^(nm\d+)$/.test(person.imdb_id ?? "") && (
+              <a className="section-link" href={`https://www.imdb.com/name/${person.imdb_id}/`} target="_blank" rel="noreferrer">
+                IMDb <HiArrowUpRight aria-hidden="true" />
               </a>
-            </p>
-          )}
-          {data.imdb_id && (
-            <p>
-              <span className="font-semibold">IMDb:</span>{" "}
-              <a
-                href={`https://www.imdb.com/name/${data.imdb_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline"
-              >
-                View Profile
+            )}
+            {/^(https?):\/\//.test(person.homepage ?? "") && (
+              <a className="section-link" href={person.homepage!} target="_blank" rel="noreferrer">
+                {t("media.website")} <HiArrowUpRight aria-hidden="true" />
               </a>
-            </p>
-          )}
-        </div>
-
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Biography</h2>
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-            {data.biography || "No biography available."}
-          </p>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 });

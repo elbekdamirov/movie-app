@@ -1,55 +1,78 @@
-import { memo, useState } from "react";
+import { memo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSearchMovie } from "../model/useSearchMovie";
+import { getSearchFilter } from "../model/searchLocation";
+import type { SearchFilter } from "../api/fetchApi";
 import { MovieList } from "@/widgets/movie-list";
-import { Empty, Input } from "antd";
-import useDebounce from "@/shared/hooks/useDebounce";
+import { MoviePagination } from "@/features/movie-pagination";
+import { PersonCard } from "@/entities/crew";
+import { MAX_TMDB_PAGE } from "@/entities/movie";
+import { FilterTabs, StatusMessage } from "@/shared/ui";
 import { useTranslation } from "react-i18next";
-import { MdMovie } from "react-icons/md";
+
+const searchFilters = [
+  { value: "multi", label: "All" },
+  { value: "movie", label: "header.nav.movies" },
+  { value: "tv", label: "header.nav.series" },
+  { value: "person", label: "search.people" },
+] satisfies { value: SearchFilter; label: string }[];
 
 export const SearchMovie = memo(() => {
-  const [value, setValue] = useState("");
+  const [params, setParams] = useSearchParams();
+  const query = params.get("q")?.trim() ?? "";
+  const type = getSearchFilter(params.get("type"));
+  const rawPage = Number(params.get("page"));
+  const page = Number.isInteger(rawPage) ? Math.max(1, Math.min(rawPage, MAX_TMDB_PAGE)) : 1;
   const { getMovieBySearch } = useSearchMovie();
-  const debounceValue = useDebounce(value, 800);
-  const { data, isFetching } = getMovieBySearch({ query: debounceValue });
+  const { data, isPending, isError, refetch } = getMovieBySearch({ query, page, type }, !!query);
   const { t } = useTranslation();
 
-  const showEmpty = !data?.results?.length && debounceValue && !isFetching;
-  const showPlaceholder = !value.trim();
+  const changeType = (filter: SearchFilter) => {
+    const next = new URLSearchParams(params);
+    if (filter === "multi") next.delete("type");
+    else next.set("type", filter);
+    next.delete("page");
+    setParams(next);
+  };
+
+  const people = data?.results.filter((item) => item.media_type === "person") ?? [];
+  const titles = data?.results.filter((item) => item.media_type !== "person") ?? [];
 
   return (
-    <div className="min-h-[54vh]">
-      <div className="container">
-        <Input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder={t("search.placeholder")}
-          className="search-movie-input"
+    <div className="page-section">
+      <div className="container search-results-heading">
+        <h1 className="page-title">{t(query ? "search.resultsHeading" : "header.nav.search", { query })}</h1>
+        {data && (
+          <p className="muted text-sm" role="status">
+            {t("search.resultsCount", { count: data.total_results })}
+          </p>
+        )}
+        <FilterTabs
+          label={t("search.filterLabel")}
+          value={type}
+          options={searchFilters.map(({ value, label }) => ({ value, label: t(label) }))}
+          onChange={changeType}
         />
-        <br />
-        <br />
       </div>
 
-      {showPlaceholder ? (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400">
-          <MdMovie className="text-6xl mb-4 opacity-70" />
-          <span className="text-lg font-medium">{t("search.startTyping")}</span>
-        </div>
+      {!query ? (
+        <StatusMessage message={t("search.startTyping")} />
+      ) : isPending ? (
+        <MovieList loading landscape />
+      ) : isError ? (
+        <StatusMessage message={t("search.loadError")} onRetry={() => void refetch()} />
       ) : (
         <>
-          <MovieList movies={data?.results} loading={isFetching} />
-          {showEmpty && (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Empty
-                description={
-                  <span className="text-gray-600 dark:text-gray-400 text-lg font-medium">
-                    {t("search.noResults")}
-                  </span>
-                }
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                imageStyle={{ filter: "grayscale(100%)", opacity: 0.7 }}
-              />
-            </div>
+          {titles.length > 0 && <MovieList movies={titles} loading={false} landscape />}
+          {people.length > 0 && (
+            <section aria-label={t("search.people")}>
+              <div className="container people-search-grid">
+                {people.map((person) => <PersonCard key={person.id} person={person} />)}
+              </div>
+            </section>
           )}
+          {!data.results.length && <StatusMessage message={t("search.noResults", { query })} />}
+          <MoviePagination page={page} total_pages={data.total_pages} />
         </>
       )}
     </div>

@@ -25,7 +25,7 @@ export const NotFound = memo(() => {
 
       <Link
         to="/"
-        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+        className="action action-primary"
       >
         Go Home
       </Link>

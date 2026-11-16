@@ -1,36 +1,32 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { IMovie } from "@/entities/movie/model/types";
+import { getMediaPath, type IMovie } from "./types";
 
 const loadFromLocalStorage = (): IMovie[] => {
   try {
-    const data = localStorage.getItem("bookmarks");
-    return data ? JSON.parse(data) : [];
+    const data = JSON.parse(localStorage.getItem("bookmarks") ?? "[]");
+    return Array.isArray(data)
+      ? data.filter((movie) => typeof movie?.id === "number" && typeof movie.title === "string")
+      : [];
   } catch {
     return [];
   }
 };
 
-interface BookmarkState {
-  saved: IMovie[];
-}
-
-const initialState: BookmarkState = {
-  saved: loadFromLocalStorage(),
-};
-
 const bookmarkSlice = createSlice({
   name: "bookmarks",
-  initialState,
+  initialState: { saved: loadFromLocalStorage() },
   reducers: {
-    toggleBookmark: (state, action: PayloadAction<IMovie>) => {
-      const exists = state.saved.find((m) => m.id === action.payload.id);
-      if (exists) {
-        state.saved = state.saved.filter((m) => m.id !== action.payload.id);
-      } else {
-        state.saved.push(action.payload);
-      }
+    toggleBookmark: (state, { payload }: PayloadAction<IMovie>) => {
+      const path = getMediaPath(payload);
+      const index = state.saved.findIndex((movie) => getMediaPath(movie) === path);
+      if (index >= 0) state.saved.splice(index, 1);
+      else state.saved.push(payload);
 
-      localStorage.setItem("bookmarks", JSON.stringify(state.saved));
+      try {
+        localStorage.setItem("bookmarks", JSON.stringify(state.saved));
+      } catch {
+        // The current session keeps its bookmarks when storage is unavailable.
+      }
     },
   },
 });

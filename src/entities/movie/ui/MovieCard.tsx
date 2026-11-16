@@ -1,80 +1,98 @@
-import { createImageUrl } from "@/shared/utils";
+import { createImageUrl, getReleaseYear } from "@/shared/utils";
 import { memo, type FC } from "react";
-import type { IMovie } from "../model/types";
-import { useNavigate } from "react-router-dom";
-import { FaRegBookmark, FaBookmark } from "react-icons/fa";
+import { getMediaPath, type IMovie } from "../model/types";
+import { Link } from "react-router-dom";
+import { FaBookmark, FaRegBookmark, FaStar } from "react-icons/fa";
+import { GoArrowUpRight } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "@/app/store";
+import { useTranslation } from "react-i18next";
+import type { AppDispatch, RootState } from "@/app/store";
 import { toggleBookmark } from "../model/bookmarkSlice";
 
 interface Props {
   movie?: IMovie;
+  genre?: string;
+  credit?: string;
   loading?: boolean;
+  landscape?: boolean;
 }
 
-export const MovieCard: FC<Props> = memo(({ movie, loading = false }) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const saved = useSelector((state: RootState) => state.bookmarks.saved);
+export const SaveTitleButton = ({ movie, hero = false }: { movie: IMovie; hero?: boolean }) => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
+  const path = getMediaPath(movie);
+  const isSaved = useSelector((state: RootState) =>
+    state.bookmarks.saved.some((item) => getMediaPath(item) === path),
+  );
+  const label = t(isSaved ? "media.unsave" : "media.save");
+  return (
+    <button
+      type="button"
+      onClick={() => dispatch(toggleBookmark(movie))}
+      title={label}
+      aria-label={label}
+      aria-pressed={isSaved}
+      className={hero
+        ? "action action-on-image hero-save"
+        : `absolute right-2.5 top-2.5 grid size-8 place-items-center rounded-md border border-white/20 text-white transition-colors ${isSaved ? "bg-py" : "bg-black/70 hover:bg-black"}`}
+    >
+      {isSaved ? <FaBookmark aria-hidden="true" /> : <FaRegBookmark aria-hidden="true" />}
+    </button>
+  );
+};
+
+export const MovieCard: FC<Props> = memo(({ movie, genre, credit, loading = false, landscape = false }) => {
+  const { t } = useTranslation();
+  const aspect = landscape ? "aspect-video" : "aspect-[2/3]";
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-black font-medium relative animate-pulse">
-        <div className="rounded-xl bg-gray-300 dark:bg-gray-700 h-[400px] w-full" />
-        <div className="p-3 space-y-2">
-          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4" />
-          <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2" />
-          <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/4" />
+      <div className="media-card motion-safe:animate-pulse" aria-hidden="true">
+        <div className={`${aspect} bg-black/10 dark:bg-white/8`} />
+        <div className="space-y-3 p-4">
+          <div className="h-4 w-3/4 rounded bg-black/10 dark:bg-white/10" />
+          <div className="h-3 w-1/2 rounded bg-black/10 dark:bg-white/10" />
         </div>
       </div>
     );
   }
 
   if (!movie) return null;
-
-  const isSaved = saved.some((m) => m.id === movie.id);
-
-  const handleBookmark = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    dispatch(toggleBookmark(movie));
-  };
+  const year = getReleaseYear(movie.release_date);
+  const artwork = landscape && movie.backdrop_path
+    ? createImageUrl(movie.backdrop_path, "w780")
+    : createImageUrl(movie.poster_path, "w500");
 
   return (
-    <div className="bg-white dark:bg-black font-medium relative">
-      <div
-        className="rounded-xl cursor-pointer relative"
-        onClick={() => navigate(`/movie/${movie.id}`)}
-      >
-        <img
-          className="rounded-xl w-full h-[400px] object-cover"
-          src={createImageUrl(movie.poster_path)}
-          alt={movie.title}
-        />
-
-        <button
-          onClick={handleBookmark}
-          className={`absolute top-2 right-2 p-2 rounded-full transition-colors ${
-            isSaved
-              ? "bg-black/60 text-py"
-              : "bg-black/60 hover:bg-black/80 text-white"
-          }`}
-        >
-          {isSaved ? <FaBookmark size={18} /> : <FaRegBookmark size={18} />}
-        </button>
-      </div>
-
-      <div className="p-3">
-        <h3 className="line-clamp-1" title={movie.title}>
-          {movie.title}
-        </h3>
-        <p>{new Date(movie.release_date ?? "").getFullYear() || "N/A"}</p>
-        <p>
-          Rating:{" "}
-          <strong className="text-py">
-            {movie.vote_average ? movie.vote_average.toFixed(2) : "N/A"}
-          </strong>
-        </p>
-      </div>
-    </div>
+    <article className="media-card group relative">
+      <Link to={getMediaPath(movie)} className="block rounded-[15px] focus-visible:outline-offset-[-3px]">
+        <div className={`relative ${aspect} overflow-hidden bg-black/10 dark:bg-white/5`}>
+          <img
+            className="size-full object-cover motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-105"
+            src={artwork}
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          {movie.vote_count > 0 && (
+            <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 rounded-md bg-black/80 px-2 py-1 text-xs font-semibold text-white">
+              <FaStar className="text-amber-300" aria-hidden="true" />
+              {movie.vote_average.toFixed(1)}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-between gap-2 p-3 sm:p-4">
+          <div className="min-w-0">
+            <h3 className="truncate font-semibold leading-tight" title={movie.title}>{movie.title}</h3>
+            <p className="muted mt-1.5 truncate text-xs">
+              {[year, (landscape || !genre) ? t(movie.media_type === "tv" ? "media.series" : "media.movie") : genre].filter(Boolean).join(" · ")}
+            </p>
+            {credit && <p className="muted mt-1 truncate text-xs" title={credit}>{credit}</p>}
+          </div>
+          <GoArrowUpRight className="size-4 shrink-0 text-py opacity-70 transition-opacity group-hover:opacity-100" aria-hidden="true" />
+        </div>
+      </Link>
+      <SaveTitleButton movie={movie} />
+    </article>
   );
 });

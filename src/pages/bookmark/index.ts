@@ -1,1 +1,1 @@
-export { BookMark as default } from "./ui/Bookmark";
+export { MyList as default } from "./ui/Bookmark";

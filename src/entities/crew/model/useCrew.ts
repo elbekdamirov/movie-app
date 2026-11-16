@@ -1,18 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchCrewById, fetchCrewMoviesById } from "../api/fetchApi";
+import { fetchCrewById, fetchCrewCreditsById } from "../api/fetchApi";
 
 export const useCrew = () => {
   const getCrewById = (id: string) =>
     useQuery({
       queryKey: ["crewKey", id],
-      queryFn: () => fetchCrewById(id),
+      queryFn: ({ signal }) => fetchCrewById(id, signal),
+      enabled: /^[1-9]\d*$/.test(id),
+      staleTime: 1000 * 60 * 5,
+      retry: 0,
     });
 
-  const getCrewMovieById = (id: string) =>
+  const getCrewCreditsById = (id: string) =>
     useQuery({
-      queryKey: ["crewKey", id, "crewMovie"],
-      queryFn: () => fetchCrewMoviesById(id),
+      queryKey: ["crewKey", id, "combinedCredits"],
+      queryFn: ({ signal }) => fetchCrewCreditsById(id, signal),
+      enabled: /^[1-9]\d*$/.test(id),
+      staleTime: 1000 * 60 * 5,
+      retry: 0,
     });
 
-  return { getCrewById, getCrewMovieById };
+  return { getCrewById, getCrewCreditsById };
 };

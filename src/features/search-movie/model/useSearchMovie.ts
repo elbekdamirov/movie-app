@@ -1,12 +1,16 @@
-import { useQuery } from "@tanstack/react-query"
-import { fetchMovieBySearch } from "../api/fetchApi"
+import { useQuery } from "@tanstack/react-query";
+import { fetchMovieBySearch, type SearchParams } from "../api/fetchApi";
 
 export const useSearchMovie = () => {
-    const getMovieBySearch = (params: {query: string}) => useQuery({
-        queryKey: ["searchMovieKey", params],
-        queryFn: () => fetchMovieBySearch(params),
-        enabled: !!params.query
-    })
+  const getMovieBySearch = (params: SearchParams, enabled: boolean) =>
+    useQuery({
+      queryKey: ["searchMovieKey", params],
+      queryFn: ({ signal }) => fetchMovieBySearch(params, signal),
+      enabled,
+      retry: 0,
+      staleTime: 60_000,
+      refetchOnWindowFocus: false,
+    });
 
-    return {getMovieBySearch}
-}
+  return { getMovieBySearch };
+};

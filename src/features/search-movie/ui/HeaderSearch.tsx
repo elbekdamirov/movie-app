@@ -30,7 +30,7 @@ const SearchPreview = ({ result }: { result: SearchResult }) => {
   );
 };
 
-export const HeaderSearch = ({ onOpen }: { onOpen: () => void }) => {
+export const HeaderSearch = () => {
   const { t } = useTranslation();
   const { pathname, search, key, state } = useLocation();
   const navigate = useNavigate();
@@ -145,7 +145,6 @@ export const HeaderSearch = ({ onOpen }: { onOpen: () => void }) => {
         title={t("header.nav.search")}
         onClick={() => {
           if (expanded) return close();
-          onOpen();
           setHighlight(-1);
           setExpanded(true);
         }}

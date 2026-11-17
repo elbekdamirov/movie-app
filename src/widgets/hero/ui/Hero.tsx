@@ -6,7 +6,7 @@ import { A11y } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 import { createImageUrl, getReleaseYear } from "@/shared/utils";
 import { FaPlay, FaStar } from "react-icons/fa";
-import { HiArrowLeft, HiArrowRight } from "react-icons/hi2";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -92,10 +92,10 @@ export const Hero: FC<Props> = memo(({ movies, loading }) => {
             ))}
           </div>
           <button type="button" className="hero-arrow" aria-label={t("catalog.previousSlide")} onClick={() => swiper.current?.slidePrev()}>
-            <HiArrowLeft aria-hidden="true" />
+            <HiChevronLeft aria-hidden="true" />
           </button>
           <button type="button" className="hero-arrow" aria-label={t("catalog.nextSlide")} onClick={() => swiper.current?.slideNext()}>
-            <HiArrowRight aria-hidden="true" />
+            <HiChevronRight aria-hidden="true" />
           </button>
         </div>
       )}

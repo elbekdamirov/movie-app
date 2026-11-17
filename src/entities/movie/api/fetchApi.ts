@@ -16,8 +16,8 @@ export const fetchMovies = async (params: IMovieParams, type: MediaType, signal:
   return data;
 };
 
-export const fetchHomeMovies = async (feed: HomeMovieFeed, signal: AbortSignal) => {
-  const { data } = await api.get<IPagedResponse<IMovie>>(`/movie/${feed}`, { signal });
+export const fetchHomeMovies = async (feed: HomeMovieFeed, page: number, signal: AbortSignal) => {
+  const { data } = await api.get<IPagedResponse<IMovie>>(`/movie/${feed}`, { params: { page }, signal });
   return data;
 };
 

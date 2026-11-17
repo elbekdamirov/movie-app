@@ -17,7 +17,6 @@ const readDarkMode = () => {
 const MainLayout = () => {
   const { pathname } = useLocation();
   const pagePath = pathname.split("/").slice(0, 3).join("/");
-  const overHero = pagePath === "/" || /^\/(movie|tv)\/[1-9]\d*$/.test(pagePath);
   const [isDark, setIsDark] = useState(readDarkMode);
 
   useLayoutEffect(() => {
@@ -40,7 +39,7 @@ const MainLayout = () => {
         token: { colorPrimary: accent, colorPrimaryHover: accent, colorPrimaryActive: accent },
       }}
     >
-      <Header isDark={isDark} overHero={overHero} onToggleTheme={() => setIsDark((dark) => !dark)} />
+      <Header isDark={isDark} onToggleTheme={() => setIsDark((dark) => !dark)} />
       <main className="site-main">
         <Suspense fallback={<div className="hero-shell hero-skeleton motion-safe:animate-pulse" aria-hidden="true" />}>
           <Outlet />

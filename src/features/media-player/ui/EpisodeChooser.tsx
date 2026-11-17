@@ -10,7 +10,6 @@ type EpisodeChooserProps = {
   id: number;
   seasons: ISeason[];
   current: EpisodeSelection;
-  episodeName?: string;
   onSelect: (episode: EpisodeSelection) => void;
 };
 
@@ -87,7 +86,7 @@ export const EpisodeChooser = ({ fullscreen, onFullscreen, ...props }: EpisodeCh
   };
 
   return (
-    <div className="episode-toolbar" ref={root} onKeyDown={(event) => {
+    <div className={`episode-toolbar${open ? " episode-toolbar--open" : ""}`} ref={root} onKeyDown={(event) => {
       if (event.key === "Escape" && open && !event.defaultPrevented) {
         event.stopPropagation();
         close();
@@ -98,12 +97,13 @@ export const EpisodeChooser = ({ fullscreen, onFullscreen, ...props }: EpisodeCh
           ref={toggle}
           type="button"
           className="episode-menu-toggle"
+          aria-label={t("media.episodes")}
           aria-expanded={open}
           aria-controls={open ? menuId : undefined}
           onClick={() => setOpen((value) => !value)}
         >
           <HiOutlineQueueList aria-hidden="true" />
-          {t("media.episodes")}
+          <span className="episode-menu-label">{t("media.episodes")}</span>
         </button>
         <button
           type="button"

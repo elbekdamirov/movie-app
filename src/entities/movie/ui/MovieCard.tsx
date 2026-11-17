@@ -3,7 +3,6 @@ import { memo, type FC } from "react";
 import { getMediaPath, type IMovie } from "../model/types";
 import { Link } from "react-router-dom";
 import { FaBookmark, FaRegBookmark, FaStar } from "react-icons/fa";
-import { GoArrowUpRight } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "@/app/store";
@@ -49,7 +48,7 @@ export const MovieCard: FC<Props> = memo(({ movie, genre, credit, loading = fals
     return (
       <div className="media-card motion-safe:animate-pulse" aria-hidden="true">
         <div className={`${aspect} bg-black/10 dark:bg-white/8`} />
-        <div className="space-y-3 p-4">
+        <div className="media-card-copy space-y-3">
           <div className="h-4 w-3/4 rounded bg-black/10 dark:bg-white/10" />
           <div className="h-3 w-1/2 rounded bg-black/10 dark:bg-white/10" />
         </div>
@@ -81,15 +80,12 @@ export const MovieCard: FC<Props> = memo(({ movie, genre, credit, loading = fals
             </span>
           )}
         </div>
-        <div className="flex items-center justify-between gap-2 p-3 sm:p-4">
-          <div className="min-w-0">
-            <h3 className="truncate font-semibold leading-tight" title={movie.title}>{movie.title}</h3>
-            <p className="muted mt-1.5 truncate text-xs">
-              {[year, (landscape || !genre) ? t(movie.media_type === "tv" ? "media.series" : "media.movie") : genre].filter(Boolean).join(" · ")}
-            </p>
-            {credit && <p className="muted mt-1 truncate text-xs" title={credit}>{credit}</p>}
-          </div>
-          <GoArrowUpRight className="size-4 shrink-0 text-py opacity-70 transition-opacity group-hover:opacity-100" aria-hidden="true" />
+        <div className="media-card-copy">
+          <h3 className="media-card-title" title={movie.title}>{movie.title}</h3>
+          <p className="muted mt-1.5 truncate text-xs">
+            {[year, (landscape || !genre) ? t(movie.media_type === "tv" ? "media.series" : "media.movie") : genre].filter(Boolean).join(" · ")}
+          </p>
+          {credit && <p className="muted mt-1 truncate text-xs" title={credit}>{credit}</p>}
         </div>
       </Link>
       <SaveTitleButton movie={movie} />

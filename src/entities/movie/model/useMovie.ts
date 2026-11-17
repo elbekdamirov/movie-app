@@ -4,6 +4,8 @@ import { fetchImdbRating, imdbRatingEnabled } from "../api/fetchImdbRating";
 import { MAX_TMDB_PAGE } from "./types";
 import type { HomeMovieFeed, IMovieDetail, IMovieInfo, IMovieParams, MediaType } from "./types";
 
+export type HomeFeed = MediaType | HomeMovieFeed;
+
 export const seasonQueryOptions = (id: number, season: number) =>
   queryOptions({
     queryKey: ["movieKey", "tv", id, "season", season],
@@ -14,6 +16,22 @@ export const seasonQueryOptions = (id: number, season: number) =>
 
 export const useSeason = (id: number, season: number) => useQuery(seasonQueryOptions(id, season));
 
+export const useHomeFeed = (feed: HomeFeed = "movie") =>
+  useInfiniteQuery({
+    queryKey: ["movieKey", "feed", feed],
+    queryFn: ({ pageParam, signal }) => feed === "movie" || feed === "tv"
+      ? fetchMovies({ page: pageParam }, feed, signal)
+      : fetchHomeMovies(feed, pageParam, signal),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.results.length && lastPage.page < Math.min(lastPage.total_pages, MAX_TMDB_PAGE)
+        ? lastPage.page + 1
+        : undefined,
+    retry: 0,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+  });
+
 export const useMovie = () => {
   const getMovies = (params: IMovieParams = { page: 1 }, type: MediaType = "movie", enabled = true) =>
     useQuery({
@@ -23,28 +41,6 @@ export const useMovie = () => {
       retry: 0,
       refetchOnWindowFocus: false,
       staleTime: 1000 * 60,
-    });
-
-  const getInfiniteMovies = () =>
-    useInfiniteQuery({
-      queryKey: ["movieKey", "movie", "feed"],
-      queryFn: ({ pageParam, signal }) => fetchMovies({ page: pageParam }, "movie", signal),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) =>
-        lastPage.results.length && lastPage.page < Math.min(lastPage.total_pages, MAX_TMDB_PAGE)
-          ? lastPage.page + 1
-          : undefined,
-      retry: 0,
-      refetchOnWindowFocus: false,
-      staleTime: 1000 * 60,
-    });
-
-  const getHomeMovies = (feed: HomeMovieFeed) =>
-    useQuery({
-      queryKey: ["movieKey", "movie", "home", feed],
-      queryFn: ({ signal }) => fetchHomeMovies(feed, signal),
-      retry: 0,
-      staleTime: 1000 * 60 * 5,
     });
 
   const getMovieById = (id: string, type: MediaType = "movie") =>
@@ -86,5 +82,5 @@ export const useMovie = () => {
       retry: 0,
     });
 
-  return { getMovies, getInfiniteMovies, getHomeMovies, getMovieById, getMovieInfo, getGenres, getRecommendations, getImdbRating };
+  return { getMovies, getMovieById, getMovieInfo, getGenres, getRecommendations, getImdbRating };
 };

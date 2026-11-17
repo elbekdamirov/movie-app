@@ -29,7 +29,9 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
   const progress = useSelector((state: RootState) => state.watchProgress.saved.find((item) =>
     item.id === movie.id && item.media_type === type));
   const playerSection = useRef<HTMLElement>(null);
-  const activeButton = useRef<HTMLButtonElement>(null);
+  const watchButton = useRef<HTMLButtonElement>(null);
+  const resumeButton = useRef<HTMLButtonElement>(null);
+  const trailerButton = useRef<HTMLButtonElement>(null);
   const episodeButton = useRef<HTMLButtonElement>(null);
   const id = String(movie.id);
   const savedMovie = {
@@ -68,7 +70,7 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
 
   useEffect(() => {
     if (!mode) return;
-    if (mode === "play" && request.revision) playerSection.current?.focus({ preventScroll: true });
+    if (mode === "trailer" || request.revision) playerSection.current?.focus({ preventScroll: true });
     playerSection.current?.scrollIntoView({ block: "start" });
   }, [mode, request]);
 
@@ -81,17 +83,17 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
         actions={
           <>
             {canPlay && (
-              <button type="button" ref={activeButton} className={`action ${progress ? "action-on-image" : "action-primary"}`} onClick={(event) => openPlayer(false, event.currentTarget)}>
+              <button type="button" ref={watchButton} className={`action ${progress ? "action-on-image" : "action-primary"}`} onClick={(event) => openPlayer(false, event.currentTarget)}>
                 <FaPlay className="size-3" aria-hidden="true" /> {t("watch")}
               </button>
             )}
             {canPlay && progress && (
-              <button type="button" className="action action-primary order-first" onClick={(event) => openPlayer(true, event.currentTarget)}>
+              <button type="button" ref={resumeButton} className="action action-primary order-first" onClick={(event) => openPlayer(true, event.currentTarget)}>
                 <FaPlay className="size-3" aria-hidden="true" /> {t("media.resume")}
               </button>
             )}
             {trailerUrl && (
-              <button type="button" ref={mode === "trailer" ? activeButton : null} className="action action-on-image" onClick={() => setMode("trailer")} aria-expanded={mode === "trailer"}>
+              <button type="button" ref={trailerButton} className="action action-on-image" onClick={() => setMode("trailer")} aria-expanded={mode === "trailer"}>
                 <HiFilm aria-hidden="true" /> {t("media.trailer")}
               </button>
             )}
@@ -105,7 +107,7 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
           {mode === "trailer" && <div className="section-heading">
             <h2 id="player-title">{t("media.trailer")}</h2>
             <button type="button" className="header-icon" aria-label={t("media.closePlayer")} onClick={() => {
-              const trigger = activeButton.current;
+              const trigger = trailerButton.current;
               setMode(null);
               requestAnimationFrame(() => {
                 trigger?.focus({ preventScroll: true });
@@ -156,7 +158,8 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
           <button type="button" className="action action-secondary" onClick={() => {
             setMode(null);
             requestAnimationFrame(() => {
-              const trigger = episodeButton.current?.isConnected ? episodeButton.current : activeButton.current;
+              const defaultButton = (request.resume && resumeButton.current) || watchButton.current;
+              const trigger = episodeButton.current?.isConnected ? episodeButton.current : defaultButton;
               trigger?.focus({ preventScroll: true });
               trigger?.scrollIntoView({ block: "nearest" });
             });
@@ -187,7 +190,7 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
         <section className="container mt-9">
           <div className="section-heading"><h2>{t("media.gallery")}</h2></div>
           <Image.PreviewGroup>
-            <div className="flex gap-3 overflow-x-auto pb-3">
+            <div className="horizontal-scroll flex gap-3 pb-3 *:shrink-0" tabIndex={0} role="group" aria-label={t("media.gallery")}>
               {images.backdrops.slice(0, 12).map(({ file_path }, index) => (
                 <Image
                   key={file_path}

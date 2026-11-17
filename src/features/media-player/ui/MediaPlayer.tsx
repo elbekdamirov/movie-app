@@ -16,6 +16,8 @@ interface FrameProps {
   media: WatchMedia;
   playback: PlaybackPosition;
   onEpisodeChange?: (selection: EpisodeSelection, internal: boolean) => void;
+  controlsVisible?: boolean;
+  onRevealControls?: () => void;
 }
 
 interface PlayerMessage {
@@ -26,12 +28,14 @@ interface PlayerMessage {
   internalNavigation?: unknown;
 }
 
-const PlayerFrame = ({ media, playback, onEpisodeChange }: FrameProps) => {
+const PlayerFrame = ({ media, playback, onEpisodeChange, controlsVisible, onRevealControls }: FrameProps) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const iframe = useRef<HTMLIFrameElement>(null);
+  const lastTap = useRef<{ side: "left" | "right"; at: number } | null>(null);
   const [attempt, setAttempt] = useState(() => ({ src: getEmbedUrl(media.id, playback), number: 0 }));
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [seekNotice, setSeekNotice] = useState<string>();
   const [tracker] = useState(() => createPlaybackTracker(
     playback,
     (sample) => dispatch(saveWatchProgress({ ...media, ...sample })),
@@ -82,8 +86,28 @@ const PlayerFrame = ({ media, playback, onEpisodeChange }: FrameProps) => {
     return () => window.clearTimeout(timer);
   }, [attempt, status]);
 
+  useEffect(() => {
+    if (!seekNotice) return;
+    const timer = window.setTimeout(() => setSeekNotice(undefined), 800);
+    return () => window.clearTimeout(timer);
+  }, [seekNotice]);
+
+  const handleSideTap = (side: "left" | "right") => {
+    onRevealControls?.();
+    const now = Date.now();
+    if (lastTap.current?.side !== side || now - lastTap.current.at > 350) {
+      lastTap.current = { side, at: now };
+      return;
+    }
+    lastTap.current = null;
+    const cursor = tracker.cursor();
+    const next = Math.max(0, Math.min(cursor.duration ?? Number.POSITIVE_INFINITY, cursor.position + (side === "left" ? -10 : 10)));
+    iframe.current?.contentWindow?.postMessage({ type: "cinesrc:command", command: "seek", args: [next] }, playerOrigin);
+    setSeekNotice(side === "left" ? "−10s" : "+10s");
+  };
+
   return (
-    <div className="player-frame">
+    <div className={`player-frame${controlsVisible === false ? " player-frame--controls-hidden" : ""}`}>
       {status === "error" ? (
         <StatusMessage
           message={t("media.playbackError")}
@@ -97,7 +121,7 @@ const PlayerFrame = ({ media, playback, onEpisodeChange }: FrameProps) => {
           <iframe
             ref={iframe}
             key={attempt.number}
-            className="size-full border-0"
+            className="cinesrc-player size-full border-0"
             title={media.title}
             src={attempt.src}
             allow="autoplay; fullscreen; picture-in-picture"
@@ -109,6 +133,12 @@ const PlayerFrame = ({ media, playback, onEpisodeChange }: FrameProps) => {
           {status === "loading" && <span className="player-loading" role="status">{t("media.loadingPlayer")}</span>}
         </>
       )}
+      {status === "ready" && onRevealControls && <>
+        <div className="player-touch-reveal" aria-hidden="true" onPointerUp={onRevealControls} />
+        <div className="player-seek-zone player-seek-zone--left" aria-hidden="true" onPointerUp={() => handleSideTap("left")} />
+        <div className="player-seek-zone player-seek-zone--right" aria-hidden="true" onPointerUp={() => handleSideTap("right")} />
+      </>}
+      {seekNotice && <span className="player-seek-notice" role="status">{seekNotice}</span>}
     </div>
   );
 };
@@ -120,6 +150,7 @@ const EpisodePlayer = ({ media, seasons, initialPlayback }: {
 }) => {
   const { t } = useTranslation();
   const { player, fullscreen, expanded, toggle } = usePlayerFullscreen();
+  const [controlsVisible, setControlsVisible] = useState(true);
   const [selection, setSelection] = useState(() => {
     if (initialPlayback?.episode && seasons.some((season) => season.season_number === initialPlayback.episode?.season)) {
       return { ...initialPlayback.episode, position: initialPlayback.position, revision: 0 };
@@ -144,8 +175,14 @@ const EpisodePlayer = ({ media, seasons, initialPlayback }: {
 
   const current = { season: selection.season, episode: selectedEpisode?.episode_number ?? selection.episode };
 
+  useEffect(() => {
+    if (!controlsVisible) return;
+    const timer = window.setTimeout(() => setControlsVisible(false), 3000);
+    return () => window.clearTimeout(timer);
+  }, [controlsVisible, fullscreen, selection.revision]);
+
   return (
-    <div ref={player} className={`tv-playback${expanded ? " tv-playback--expanded" : ""}`}>
+    <div ref={player} className={`tv-playback${expanded ? " tv-playback--expanded" : ""}${controlsVisible ? " tv-playback--controls-visible" : ""}`}>
       {isError && (
         <StatusMessage message={t("media.episodeError")} onRetry={() => void refetch()} />
       )}
@@ -154,6 +191,8 @@ const EpisodePlayer = ({ media, seasons, initialPlayback }: {
           key={selection.revision}
           playback={playback}
           media={media}
+          controlsVisible={controlsVisible}
+          onRevealControls={() => setControlsVisible(true)}
           onEpisodeChange={(episode, internal) => {
             if (!internal) return selectEpisode(episode);
             setPlaying(playback);
@@ -167,7 +206,10 @@ const EpisodePlayer = ({ media, seasons, initialPlayback }: {
         seasons={seasons}
         current={current}
         fullscreen={fullscreen}
-        onFullscreen={() => void toggle()}
+        onFullscreen={() => {
+          setControlsVisible(true);
+          void toggle();
+        }}
         onSelect={(next) => {
           if (next.season !== current.season || next.episode !== current.episode || !playback) selectEpisode(next);
         }}

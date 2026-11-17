@@ -60,7 +60,7 @@ const PersonDetail = ({ id }: { id: string }) => {
 
       <section className="mt-10" aria-labelledby="filmography">
         <div className="container mb-5">
-          <div className="section-heading">
+          <div className="section-heading flex-wrap">
             <h2 id="filmography">{t(credits.data && !isCast ? "people.workedOn" : "people.appearedIn")}</h2>
             {filmography.length > 0 && <p className="muted text-sm">{t("people.featuredOrder")}</p>}
           </div>

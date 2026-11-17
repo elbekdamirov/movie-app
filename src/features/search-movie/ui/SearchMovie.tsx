@@ -65,7 +65,8 @@ export const SearchMovie = memo(() => {
         <>
           {titles.length > 0 && <MovieList movies={titles} loading={false} landscape />}
           {people.length > 0 && (
-            <section aria-label={t("search.people")}>
+            <section className={titles.length > 0 ? "mt-8" : undefined} aria-label={t("search.people")}>
+              {titles.length > 0 && <div className="container section-heading"><h2>{t("search.people")}</h2></div>}
               <div className="container people-search-grid">
                 {people.map((person) => <PersonCard key={person.id} person={person} />)}
               </div>

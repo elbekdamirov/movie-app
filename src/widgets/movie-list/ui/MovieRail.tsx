@@ -27,7 +27,7 @@ export const HorizontalRail = ({ children, count, label, loadingMore, onLoadMore
       const right = remaining > 2;
       setEdges((previous) => previous.left === left && previous.right === right ? previous : { left, right });
 
-      if (left && remaining <= element.clientWidth / 2 && !loadingMore) {
+      if (count > 0 && element.clientWidth > 0 && remaining <= element.clientWidth / 2 && !loadingMore) {
         onLoadMore?.();
       }
     };
@@ -72,7 +72,7 @@ export const HorizontalRail = ({ children, count, label, loadingMore, onLoadMore
       >
         <HiChevronLeft aria-hidden="true" />
       </button>
-      <div ref={track} className="movie-rail-track" tabIndex={0} role="group" aria-label={label}>
+      <div ref={track} className="horizontal-scroll movie-rail-track" tabIndex={0} role="group" aria-label={label}>
         {children}
       </div>
       <button

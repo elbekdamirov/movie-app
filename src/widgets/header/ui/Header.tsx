@@ -1,8 +1,7 @@
-import { memo, useState } from "react";
+import { memo } from "react";
 import logo from "@/shared/assets/logo.svg";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
-import { HiMenuAlt3, HiX } from "react-icons/hi";
 import {
   HiOutlineBookmark, HiOutlineFilm, HiOutlineHome,
   HiOutlineTrophy, HiOutlineTv, HiOutlineUserCircle,
@@ -23,44 +22,38 @@ const catalogLinks = [
   { to: "/my-list", label: "myList", icon: HiOutlineBookmark },
 ];
 
-export const Header = memo(({ isDark, overHero, onToggleTheme }: { isDark: boolean; overHero: boolean; onToggleTheme: () => void }) => {
+export const Header = memo(({ isDark, onToggleTheme }: { isDark: boolean; onToggleTheme: () => void }) => {
   const { t, i18n } = useTranslation();
-  const { pathname } = useLocation();
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
-  const [openMenuPath, setOpenMenuPath] = useState<string | null>(null);
-  const isMobileMenuOpen = openMenuPath === pathname;
 
   const accountItems: MenuProps["items"] = [
     { key: "account", label: user?.name || user?.email, disabled: true },
     { key: "logout", label: t("header.nav.logout"), onClick: () => dispatch(logout()) },
   ];
 
-  const closeMenu = () => setOpenMenuPath(null);
   const themeLabel = t(isDark ? "header.nav.light" : "header.nav.dark");
-  const renderNav = () => catalogLinks.map(({ to, label, icon: Icon }) => (
-    <NavLink key={to} to={to} end={to === "/"} className="header-link" onClick={closeMenu}>
+  const renderNav = (className: string) => catalogLinks.map(({ to, label, icon: Icon }) => (
+    <NavLink key={to} to={to} end={to === "/"} className={className}>
       <Icon aria-hidden="true" />
-      {t(`header.nav.${label}`)}
+      <span>{t(`header.nav.${label}`)}</span>
     </NavLink>
   ));
 
   return (
-    <header className={`site-header${overHero ? " site-header--hero" : ""}`}>
+    <>
+    <header className="site-header">
       <div className="container header-inner">
-        <Link to="/" aria-label={t("header.nav.main")} className="shrink-0" onClick={closeMenu}>
+        <Link to="/" aria-label={t("header.nav.main")} className="shrink-0">
           <img src={logo} alt="" className="header-logo w-[88px] sm:w-[108px]" />
         </Link>
 
         <nav className="main-navigation hidden lg:flex" aria-label={t("header.nav.navigation")}>
-          {renderNav()}
+          {renderNav("header-link")}
         </nav>
 
         <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:ml-0">
-          <HeaderSearch onOpen={closeMenu} />
-          <NavLink to="/my-list" className="header-icon header-shortcut hidden! sm:grid! lg:hidden!" aria-label={t("header.nav.myList")} title={t("header.nav.myList")} onClick={closeMenu}>
-            <HiOutlineBookmark aria-hidden="true" />
-          </NavLink>
+          <HeaderSearch />
           <button type="button" className="header-icon" aria-label={themeLabel} title={themeLabel} onClick={onToggleTheme}>
             {isDark ? <MdLightMode aria-hidden="true" /> : <MdDarkMode aria-hidden="true" />}
           </button>
@@ -85,24 +78,14 @@ export const Header = memo(({ isDark, overHero, onToggleTheme }: { isDark: boole
               </button>
             </Dropdown>
           ) : (
-            <Link to="/login" className="action action-primary header-login" onClick={closeMenu}>{t("header.nav.login")}</Link>
+            <Link to="/login" className="action action-primary header-login">{t("header.nav.login")}</Link>
           )}
-          <button
-            type="button"
-            className="header-icon lg:hidden!"
-            aria-label={t("header.nav.navigation")}
-            aria-expanded={isMobileMenuOpen}
-            onClick={() => setOpenMenuPath(isMobileMenuOpen ? null : pathname)}
-          >
-            {isMobileMenuOpen ? <HiX aria-hidden="true" /> : <HiMenuAlt3 aria-hidden="true" />}
-          </button>
         </div>
       </div>
-      {isMobileMenuOpen && (
-        <nav className="mobile-menu lg:hidden" aria-label={t("header.nav.navigation")}>
-          <div className="container grid gap-1">{renderNav()}</div>
-        </nav>
-      )}
     </header>
+    <nav className="mobile-bottom-navigation lg:hidden" aria-label={t("header.nav.navigation")}>
+      {renderNav("mobile-bottom-link")}
+    </nav>
+    </>
   );
 });

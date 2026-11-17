@@ -31,7 +31,7 @@ export const CastView: FC<Props> = memo(({ id, type, mediaType }) => {
   if (!credits?.length) return <StatusMessage message={t("media.noCredits")} />;
 
   return (
-    <div className="container flex gap-3 overflow-x-auto pt-5 pb-3">
+    <div className="container horizontal-scroll flex gap-3 pt-5 pb-3" tabIndex={0} role="group" aria-label={t(type === "cast" ? "media.cast" : "media.crew")}>
       {credits.map((person) => (
         <Link to={`/crew/${person.id}`} className="credit-card" key={person.credit_id}>
           <img src={createUserImageUrl(person.profile_path)} alt="" loading="lazy" className="aspect-[4/5] w-full object-cover" />

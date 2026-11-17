@@ -32,6 +32,20 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
   const activeButton = useRef<HTMLButtonElement>(null);
   const episodeButton = useRef<HTMLButtonElement>(null);
   const id = String(movie.id);
+  const savedMovie = {
+    id: movie.id,
+    media_type: type,
+    title: movie.title,
+    release_date: movie.release_date,
+    overview: movie.overview,
+    backdrop_path: movie.backdrop_path,
+    poster_path: movie.poster_path,
+    original_language: movie.original_language,
+    vote_average: movie.vote_average,
+    vote_count: movie.vote_count,
+    popularity: movie.popularity,
+    genre_ids: movie.genres.map((genre) => genre.id),
+  };
   const { getMovieInfo, getRecommendations } = useMovie();
   const { data: recommendations } = getRecommendations(movie, type);
   const { data: images } = getMovieInfo(id, "images", type);
@@ -60,14 +74,14 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
 
   return (
     <div className="pb-12">
-      <MovieInfo
+      {mode !== "play" && <MovieInfo
         movie={movie}
         type={type}
         logos={images?.logos}
         actions={
           <>
             {canPlay && (
-              <button type="button" ref={mode === "play" ? activeButton : null} className={`action ${progress ? "action-on-image" : "action-primary"}`} onClick={(event) => openPlayer(false, event.currentTarget)} aria-expanded={mode === "play"}>
+              <button type="button" ref={activeButton} className={`action ${progress ? "action-on-image" : "action-primary"}`} onClick={(event) => openPlayer(false, event.currentTarget)}>
                 <FaPlay className="size-3" aria-hidden="true" /> {t("watch")}
               </button>
             )}
@@ -81,30 +95,17 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
                 <HiFilm aria-hidden="true" /> {t("media.trailer")}
               </button>
             )}
-            <SaveTitleButton hero movie={{
-              id: movie.id,
-              media_type: type,
-              title: movie.title,
-              release_date: movie.release_date,
-              overview: movie.overview,
-              backdrop_path: movie.backdrop_path,
-              poster_path: movie.poster_path,
-              original_language: movie.original_language,
-              vote_average: movie.vote_average,
-              vote_count: movie.vote_count,
-              popularity: movie.popularity,
-              genre_ids: movie.genres.map((genre) => genre.id),
-            }} />
+            <SaveTitleButton hero movie={savedMovie} />
           </>
         }
-      />
+      />}
 
       {mode && (
-        <section ref={playerSection} className="container player-section" aria-labelledby="player-title" tabIndex={-1}>
-          <div className="section-heading">
-            <h2 id="player-title">{t(mode === "play" ? "watch" : "media.trailer")}</h2>
+        <section ref={playerSection} className={`container player-section${mode === "play" ? " player-section--watch" : ""}`} aria-label={t(mode === "play" ? "watch" : "media.trailer")} tabIndex={-1}>
+          {mode === "trailer" && <div className="section-heading">
+            <h2 id="player-title">{t("media.trailer")}</h2>
             <button type="button" className="header-icon" aria-label={t("media.closePlayer")} onClick={() => {
-              const trigger = mode === "play" && request.revision ? episodeButton.current : activeButton.current;
+              const trigger = activeButton.current;
               setMode(null);
               requestAnimationFrame(() => {
                 trigger?.focus({ preventScroll: true });
@@ -113,7 +114,7 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
             }}>
               <HiXMark aria-hidden="true" />
             </button>
-          </div>
+          </div>}
           {mode === "play" && canPlay && (
             <MediaPlayer
               key={request.revision}
@@ -144,6 +145,29 @@ const DetailContent = ({ movie, type, autoPlay, resume }: {
           )}
         </section>
       )}
+
+      {mode === "play" && <MovieInfo
+        movie={movie}
+        type={type}
+        logos={images?.logos}
+        compact
+        actions={<>
+          <SaveTitleButton hero movie={savedMovie} />
+          <button type="button" className="action action-secondary" onClick={() => {
+            setMode(null);
+            requestAnimationFrame(() => {
+              const trigger = episodeButton.current?.isConnected ? episodeButton.current : activeButton.current;
+              trigger?.focus({ preventScroll: true });
+              trigger?.scrollIntoView({ block: "nearest" });
+            });
+          }}>
+            <HiXMark aria-hidden="true" /> {t("media.closePlayer")}
+          </button>
+          {trailerUrl && <button type="button" className="action action-secondary" onClick={() => setMode("trailer")}>
+            <HiFilm aria-hidden="true" /> {t("media.trailer")}
+          </button>}
+        </>}
+      />}
 
       {type === "tv" && seasons.length > 0 && (
         <>

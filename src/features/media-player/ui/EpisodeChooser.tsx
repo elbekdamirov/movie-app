@@ -62,7 +62,7 @@ const EpisodeMenu = ({ id, seasons, current, onSelect }: EpisodeChooserProps) =>
   );
 };
 
-export const EpisodeChooser = ({ episodeName, fullscreen, onFullscreen, ...props }: EpisodeChooserProps & {
+export const EpisodeChooser = ({ fullscreen, onFullscreen, ...props }: EpisodeChooserProps & {
   fullscreen: boolean;
   onFullscreen: () => void;
 }) => {
@@ -93,12 +93,6 @@ export const EpisodeChooser = ({ episodeName, fullscreen, onFullscreen, ...props
         close();
       }
     }}>
-      <p className="episode-now-playing" aria-live="polite">
-        {props.current.episode > 0 && (
-          <span className="episode-now-number">{t("media.resumeEpisode", { ...props.current })}</span>
-        )}
-        {episodeName && <>{" "}<span className="truncate">{episodeName}</span></>}
-      </p>
       <div className="episode-toolbar-actions">
         <button
           ref={toggle}

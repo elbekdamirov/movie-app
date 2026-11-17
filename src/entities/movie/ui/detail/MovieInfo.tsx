@@ -11,9 +11,10 @@ interface Props {
   type: MediaType;
   logos?: IMovieInfo["images"]["logos"];
   actions: ReactNode;
+  compact?: boolean;
 }
 
-export const MovieInfo = memo(({ movie, type, logos, actions }: Props) => {
+export const MovieInfo = memo(({ movie, type, logos, actions, compact = false }: Props) => {
   const { t, i18n } = useTranslation();
   const [failedLogo, setFailedLogo] = useState<string>();
   const language = i18n.resolvedLanguage?.split("-")[0];
@@ -21,7 +22,7 @@ export const MovieInfo = memo(({ movie, type, logos, actions }: Props) => {
   const logo = titleLogos.find((image) => image.iso_639_1 === language)
     ?? titleLogos.find((image) => image.iso_639_1 === "en")
     ?? titleLogos.find((image) => !image.iso_639_1);
-  const showLogo = logo && failedLogo !== logo.file_path;
+  const showLogo = !compact && logo && failedLogo !== logo.file_path;
   const backdrop = movie.backdrop_path || movie.poster_path;
   const year = getReleaseYear(movie.release_date);
   const votes = new Intl.NumberFormat(i18n.resolvedLanguage).format(movie.vote_count);
@@ -33,8 +34,8 @@ export const MovieInfo = memo(({ movie, type, logos, actions }: Props) => {
 
   return (
     <section aria-labelledby="detail-title">
-      <div className="detail-hero">
-        {backdrop && (
+      <div className={compact ? "detail-compact" : "detail-hero"}>
+        {!compact && backdrop && (
           <img
             className="hero-image"
             src={createImageUrl(backdrop, "w1280")}

@@ -96,15 +96,11 @@ button:disabled, select:disabled {
 }
 .main-navigation {
   align-items: center;
-  gap: 2px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 85%, transparent);
-  padding: 4px;
+  gap: 4px;
 }
 .main-navigation .header-link {
   gap: 6px;
-  border-radius: 999px;
+  border-radius: 5px;
   padding: 8px 12px;
   font-size: .86rem;
 }
@@ -1000,6 +996,32 @@ button:disabled, select:disabled {
 .detail-hero-copy {
   max-width: 680px;
 }
+.detail-compact .detail-summary {
+  padding-top: clamp(20px, 3vw, 34px);
+  padding-bottom: 8px;
+}
+.detail-compact .detail-summary h1 {
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+}
+.detail-compact .detail-title-logo {
+  max-height: 84px;
+}
+.detail-compact .hero-meta,
+.detail-compact .hero-meta strong {
+  color: var(--text);
+}
+.detail-compact .detail-genres,
+.detail-compact .detail-tagline,
+.detail-compact .detail-overview {
+  color: var(--muted);
+}
+.detail-compact .detail-overview {
+  max-width: 75ch;
+}
+.detail-compact .detail-chip {
+  border-color: var(--border);
+  color: var(--text);
+}
 .detail-summary h1 {
   font-size: clamp(2.6rem, 6vw, 6.2rem);
 }
@@ -1084,7 +1106,10 @@ button:disabled, select:disabled {
 }
 .player-section {
   margin-top: 26px;
-  scroll-margin-top: 91px;
+  scroll-margin-top: calc(var(--header-height) + 8px);
+}
+.player-section--watch {
+  margin-top: 0;
 }
 .player-section:focus {
   outline: none;
@@ -1119,9 +1144,8 @@ button:disabled, select:disabled {
 .player-frame .status-message {
   color: #d2ced8;
 }
-.tv-playback > .player-frame {
-  border-top: 0;
-  border-radius: 0 0 13px 13px;
+.tv-playback {
+  position: relative;
 }
 .tv-playback--expanded {
   position: fixed;
@@ -1136,9 +1160,8 @@ button:disabled, select:disabled {
   background: #09090b;
 }
 .tv-playback:is(:fullscreen, .tv-playback--expanded) > .episode-toolbar {
-  flex-shrink: 0;
-  border-radius: 0;
-  padding-inline: max(9px, env(safe-area-inset-left)) max(9px, env(safe-area-inset-right));
+  top: max(10px, env(safe-area-inset-top));
+  right: max(10px, env(safe-area-inset-right));
 }
 .tv-playback:is(:fullscreen, .tv-playback--expanded) > .player-frame {
   flex: 1;
@@ -1151,29 +1174,11 @@ button:disabled, select:disabled {
   max-height: min(62dvh, 40rem);
 }
 .episode-toolbar {
-  position: relative;
+  position: absolute;
   z-index: 5;
-  display: flex;
-  min-height: 53px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: 13px 13px 0 0;
-  background: var(--surface);
-  padding: 6px 9px 6px clamp(10px, 2vw, 18px);
-}
-.episode-now-playing {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 8px;
-  font-size: .86rem;
-  font-weight: 650;
-}
-.episode-now-number {
-  flex-shrink: 0;
-  color: var(--muted);
+  top: 10px;
+  right: 10px;
+  max-width: calc(100% - 20px);
 }
 .episode-toolbar-actions {
   display: flex;
@@ -1186,12 +1191,14 @@ button:disabled, select:disabled {
   flex-shrink: 0;
   align-items: center;
   gap: 7px;
-  border: 1px solid var(--border);
+  border: 1px solid #ffffff50;
   border-radius: 8px;
-  background: var(--raised);
+  background: #101014d9;
+  color: #fff;
   padding: 0 10px;
   font-size: .86rem;
   font-weight: 650;
+  backdrop-filter: blur(8px);
 }
 .episode-menu-toggle:hover, .episode-menu-toggle[aria-expanded="true"] {
   border-color: var(--accent);
@@ -1207,7 +1214,7 @@ button:disabled, select:disabled {
 .episode-menu {
   position: absolute;
   inset: calc(100% + 5px) 0 auto auto;
-  width: min(100%, 345px);
+  width: min(345px, calc(100vw - 32px));
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
@@ -1474,6 +1481,14 @@ button:disabled, select:disabled {
       linear-gradient(90deg, #0c0a1260, transparent);
   }
   .hero-image { object-position: 60% 30%; }
+  .player-section--watch { padding-inline: 0; }
+  .player-section--watch .player-frame { min-height: 0; border-inline: 0; border-radius: 0; }
+  .detail-compact .detail-summary { padding-top: 22px; padding-bottom: 8px; }
+  .detail-compact .detail-summary h1 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+  .episode-toolbar { top: 6px; right: 6px; }
+  .episode-toolbar-actions { gap: 4px; }
+  .episode-menu-toggle { min-height: 32px; padding-inline: 7px; font-size: .75rem; }
+  .episode-fullscreen-toggle { width: 32px; }
   .hero-content, .detail-summary {
     padding-top: clamp(140px, 25svh, 225px);
     padding-bottom: 92px;

@@ -100,8 +100,8 @@ const PlayerFrame = ({ media, playback, onEpisodeChange }: FrameProps) => {
             className="size-full border-0"
             title={media.title}
             src={attempt.src}
-            allow={onEpisodeChange ? "autoplay; picture-in-picture; fullscreen 'none'" : "autoplay; fullscreen; picture-in-picture"}
-            allowFullScreen={!onEpisodeChange}
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
             referrerPolicy="strict-origin-when-cross-origin"
             sandbox="allow-scripts allow-same-origin allow-presentation"
             onError={() => setStatus("error")}
@@ -146,17 +146,6 @@ const EpisodePlayer = ({ media, seasons, initialPlayback }: {
 
   return (
     <div ref={player} className={`tv-playback${expanded ? " tv-playback--expanded" : ""}`}>
-      <EpisodeChooser
-        id={media.id}
-        seasons={seasons}
-        current={current}
-        episodeName={selectedEpisode?.name}
-        fullscreen={fullscreen}
-        onFullscreen={() => void toggle()}
-        onSelect={(next) => {
-          if (next.season !== current.season || next.episode !== current.episode || !playback) selectEpisode(next);
-        }}
-      />
       {isError && (
         <StatusMessage message={t("media.episodeError")} onRetry={() => void refetch()} />
       )}
@@ -173,6 +162,16 @@ const EpisodePlayer = ({ media, seasons, initialPlayback }: {
         />
       )}
       {!isPending && !isError && !playback && <StatusMessage message={t("media.noEpisodes")} />}
+      <EpisodeChooser
+        id={media.id}
+        seasons={seasons}
+        current={current}
+        fullscreen={fullscreen}
+        onFullscreen={() => void toggle()}
+        onSelect={(next) => {
+          if (next.season !== current.season || next.episode !== current.episode || !playback) selectEpisode(next);
+        }}
+      />
     </div>
   );
 };
